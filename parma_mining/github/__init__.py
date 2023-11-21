@@ -1,4 +1,4 @@
-"""github data sourcing package."""
+"""Github data sourcing package."""
 
 import importlib.metadata
 
