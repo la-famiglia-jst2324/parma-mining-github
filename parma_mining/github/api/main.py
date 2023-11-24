@@ -2,13 +2,20 @@
 from typing import List
 
 from fastapi import FastAPI
-
 from parma_mining.github.client import GitHubClient
+from parma_mining.github.model import OrganizationModel
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # This loads the environment variables from .env
+
+# Now you can access your GitHub token like this
+github_token = os.getenv("GITHUB_TOKEN")
 
 app = FastAPI()
 
 # Initialize GitHubClient with your token
-token = "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"  # Replace with your actual GitHub access token
+token = github_token  # Replace with your actual GitHub access token
 github_client = GitHubClient(token)
 
 
@@ -19,15 +26,9 @@ def root():
     return {"welcome": "at parma-mining-github"}
 
 
-@app.get("/user/{username}", status_code=200)
-def get_user(username: str):
-    """Endpoint to get a GitHub user's information."""
-    user_info = github_client.get_user(username)
-    return {"user_info": user_info}
-
-
-@app.get("/org/{org_name}/repos", response_model=List[str])
-def get_organization_repositories(org_name: str):
-    """Endpoint to get a list of repositories for a given organization."""
-    repos = github_client.list_organization_repositories(org_name)
-    return repos
+# Endpoint to retrieve Github information about an organization
+@app.get("/{org_name}", response_model=OrganizationModel)
+def get_organization_details(org_name: str):
+    """Endpoint to get detailed information about a given organization."""
+    org_details = github_client.get_organization_details(org_name)
+    return org_details
