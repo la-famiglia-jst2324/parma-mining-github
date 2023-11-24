@@ -7,23 +7,17 @@ from parma_mining.github.model import OrganizationModel
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # This loads the environment variables from .env
+# Load the environment variables
+load_dotenv()
 
-# Now you can access your GitHub token like this
+# Access GitHub token from env
 github_token = os.getenv("GITHUB_TOKEN")
 
 app = FastAPI()
 
-# Initialize GitHubClient with your token
-token = github_token  # Replace with your actual GitHub access token
+# Initialize GitHubClient
+token = github_token
 github_client = GitHubClient(token)
-
-
-# root endpoint
-@app.get("/", status_code=200)
-def root():
-    """Root endpoint for the API."""
-    return {"welcome": "at parma-mining-github"}
 
 
 # Endpoint to retrieve Github information about an organization
