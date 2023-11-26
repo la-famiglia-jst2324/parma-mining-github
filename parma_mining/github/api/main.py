@@ -2,6 +2,8 @@
 from typing import List
 
 from fastapi import FastAPI
+from starlette import status
+
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import OrganizationModel
 from dotenv import load_dotenv
@@ -20,8 +22,19 @@ token = github_token
 github_client = GitHubClient(token)
 
 
+# root endpoint
+@app.get("/", status_code=status.HTTP_200_OK)
+def root():
+    """Root endpoint for the API."""
+    return {"welcome": "at parma-mining-github"}
+
+
 # Endpoint to retrieve Github information about an organization
-@app.get("/{org_name}", response_model=OrganizationModel)
+@app.get(
+    "/organization/{org_name}",
+    response_model=OrganizationModel,
+    status_code=status.HTTP_200_OK,
+)
 def get_organization_details(org_name: str):
     """Endpoint to get detailed information about a given organization."""
     org_details = github_client.get_organization_details(org_name)

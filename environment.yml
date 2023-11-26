@@ -12,6 +12,8 @@ dependencies:
   - setuptools >=61 # pyproject.toml support
   # Development
   - types-pyyaml
+  - python-dotenv>=1.0.0
+  - pygithub>=2.1.1
   # Testing
   - pytest >=6 # --import-mode option
   - pytest-cov
