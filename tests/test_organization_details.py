@@ -44,7 +44,6 @@ def mock_github_client(mocker):
 
 
 def test_get_organization_details(mock_github_client):
-    # Perform a test GET request to your endpoint
     response = client.get("/organization/TestOrg")
 
     assert response.status_code == 200
