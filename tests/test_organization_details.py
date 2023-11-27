@@ -5,11 +5,6 @@ from parma_mining.github.api.main import app
 client = TestClient(app)
 
 
-@pytest.fixture(autouse=True)
-def mock_env_vars(monkeypatch):
-    monkeypatch.setenv("GITHUB_TOKEN", "test-token")
-
-
 @pytest.fixture
 def mock_github_client(mocker):
     """Mocking the GitHubClient's method to avoid actual API calls during testing."""
