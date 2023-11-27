@@ -4,7 +4,6 @@ from parma_mining.github.api.main import (
     app,
 )  # Replace with the actual import for your FastAPI app
 
-# Setup TestClient for FastAPI
 client = TestClient(app)
 
 
