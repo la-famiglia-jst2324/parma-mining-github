@@ -7,7 +7,7 @@ RUN micromamba install -y -n base -f /tmp/environment.yml && \
 
 WORKDIR /app
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER parma_mining_github /app/parma_mining_github
+COPY --chown=$MAMBA_USER:$MAMBA_USER parma_mining /app/parma_mining
 
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
