@@ -9,16 +9,11 @@ import os
 
 load_dotenv()
 
-github_token = os.getenv("GITHUB_TOKEN")
-
 app = FastAPI()
 
-token = os.getenv("GITHUB_TOKEN")
+github_token = os.getenv("GITHUB_TOKEN", "default-test-token")
 
-if github_token is None:
-    raise ValueError("GITHUB_TOKEN environment variable must be set")
-else:
-    github_client = GitHubClient(github_token)
+github_client = GitHubClient(github_token)
 
 
 # root endpoint
