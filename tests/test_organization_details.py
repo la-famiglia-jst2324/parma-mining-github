@@ -9,7 +9,7 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_github_client(mocker):
-    # Mocking the GitHubClient's method to avoid actual API calls during testing
+    """Mocking the GitHubClient's method to avoid actual API calls during testing."""
     mock = mocker.patch(
         "parma_mining.github.api.main.GitHubClient.get_organization_details"
     )
