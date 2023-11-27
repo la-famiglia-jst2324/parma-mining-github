@@ -1,8 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from parma_mining.github.api.main import (
-    app,
-)  # Replace with the actual import for your FastAPI app
+from parma_mining.github.api.main import app
 
 client = TestClient(app)
 
@@ -34,9 +32,8 @@ def mock_github_client(mocker):
                 "watchers_count": 5,
                 "forks_count": 3,
                 "open_issues_count": 2,
-                "stars": 10,  # or any other custom fields you have
+                "stars": 10,
                 "forks": 3,
-                # Add all other required fields as per your Pydantic model
             }
         ],
     }
@@ -48,7 +45,6 @@ def test_get_organization_details(mock_github_client):
 
     assert response.status_code == 200
 
-    # Assert the content of the response
     assert response.json() == {
         "name": "TestOrg",
         "description": "A test organization",
@@ -70,9 +66,8 @@ def test_get_organization_details(mock_github_client):
                 "watchers_count": 5,
                 "forks_count": 3,
                 "open_issues_count": 2,
-                "stars": 10,  # or any other custom fields you have
+                "stars": 10,
                 "forks": 3,
-                # Include all other fields that are part of your Pydantic model
             }
         ],
     }

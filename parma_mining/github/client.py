@@ -1,12 +1,14 @@
-from github import Github, GithubException
+from github import Github, GithubException, Auth
+
+from parma_mining.github.model import OrganizationModel, RepositoryModel
 
 
 class GitHubClient:
-    def __init__(self, token):
-        self.client = Github(token)
+    def __init__(self, token: str):
+        self.client = Github(auth=Auth.Token(token))
 
     # Retrieve organization details and statistics on all repositories of the organization
-    def get_organization_details(self, org_name):
+    def get_organization_details(self, org_name: str) -> OrganizationModel:
         try:
             organization = self.client.get_organization(org_name)
             org_info = {
@@ -17,7 +19,7 @@ class GitHubClient:
             }
 
             for repo in organization.get_repos():
-                org_info["repos"].append(
+                parsed_repo = RepositoryModel.model_validate(
                     {
                         "name": repo.name,
                         "description": repo.description or "",
@@ -44,8 +46,9 @@ class GitHubClient:
                         "open_issues_count": repo.open_issues_count,
                     }
                 )
+                org_info["repos"].append(parsed_repo)
 
-            return org_info
+            return OrganizationModel.model_validate(org_info)
         except GithubException as e:
             print(f"Error retrieving organization details: {e}")
-            return {}
+            return OrganizationModel(name=org_name, description="", url="", repos=[])
