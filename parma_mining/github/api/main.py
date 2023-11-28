@@ -23,7 +23,6 @@ def root():
     return {"welcome": "at parma-mining-github"}
 
 
-# Endpoint to retrieve Github information about an organization
 @app.get(
     "/organization/{org_name}",
     response_model=OrganizationModel,
