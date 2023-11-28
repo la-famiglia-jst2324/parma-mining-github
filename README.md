@@ -29,7 +29,11 @@ The following steps will get you started with the project.
    make install  # execute the last 2 steps manually!
    ```
 
-4. **Start the api server**:
+4. **Add credentials**:
+
+Use the Github access token and add it to the .env file: https://www.notion.so/La-Famiglia-VC-86ebaf0018ca474c9478f848062191a4?pvs=4
+
+5. **Start the api server**:
 
    ```bash
    make dev
@@ -39,13 +43,13 @@ The following steps will get you started with the project.
 
    FastApi will provide you with an interactive documentation of the api. You can also use the swagger ui at [http://localhost:8000/docs](http://localhost:8000/docs) or the redoc ui at [http://localhost:8000/redoc](http://localhost:8000/redoc).
 
-5. Optional: Running the pre-commit pipeline manually
+6. Optional: Running the pre-commit pipeline manually
 
    ```bash
    pre-commit run --all
    ```
 
-6. Test your code:
+7. Test your code:
 
    ```bash
    make test
