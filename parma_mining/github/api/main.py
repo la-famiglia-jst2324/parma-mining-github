@@ -1,5 +1,5 @@
 """Main entrypoint for the API routes in of parma-analytics."""
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from starlette import status
 
 from parma_mining.github.client import GitHubClient
@@ -27,6 +27,7 @@ def root():
     "/organization/{org_name}",
     response_model=OrganizationModel,
     status_code=status.HTTP_200_OK,
+    responses={404: {"description": "Organization not found"}},
 )
 def get_organization_details(org_name: str) -> OrganizationModel:
     """Endpoint to get detailed information about a given organization."""

@@ -1,4 +1,6 @@
+from fastapi import HTTPException
 from github import Github, GithubException, Auth
+from starlette import status
 
 from parma_mining.github.model import OrganizationModel, RepositoryModel
 
@@ -50,5 +52,6 @@ class GitHubClient:
 
             return OrganizationModel.model_validate(org_info)
         except GithubException as e:
-            print(f"Error retrieving organization details: {e}")
-            return OrganizationModel(name=org_name, description="", url="", repos=[])
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+            )
