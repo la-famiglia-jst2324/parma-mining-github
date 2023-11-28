@@ -1,12 +1,15 @@
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
+from starlette import status
+from unittest.mock import MagicMock
 from parma_mining.github.api.main import app
 
 client = TestClient(app)
 
 
 @pytest.fixture
-def mock_github_client(mocker):
+def mock_github_client(mocker) -> MagicMock:
     """Mocking the GitHubClient's method to avoid actual API calls during testing."""
     mock = mocker.patch(
         "parma_mining.github.api.main.GitHubClient.get_organization_details"
@@ -40,7 +43,7 @@ def mock_github_client(mocker):
     return mock
 
 
-def test_get_organization_details(mock_github_client):
+def test_get_organization_details(mock_github_client: MagicMock):
     response = client.get("/organization/TestOrg")
 
     assert response.status_code == 200
@@ -71,3 +74,15 @@ def test_get_organization_details(mock_github_client):
             }
         ],
     }
+
+
+def test_get_organization_details_bad_request(mocker):
+    mocker.patch(
+        "parma_mining.github.api.main.GitHubClient.get_organization_details",
+        side_effect=HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+        ),
+    )
+
+    response = client.get("/organization/notExisting")
+    assert response.status_code == 404
