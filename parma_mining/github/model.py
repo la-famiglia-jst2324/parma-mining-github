@@ -3,8 +3,9 @@ from pydantic import BaseModel
 from typing import List
 
 
-# Model to structure the JSON Data
 class RepositoryModel(BaseModel):
+    """Model to structure the JSON Data."""
+
     name: str
     description: str
     stars: int
