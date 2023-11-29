@@ -1,9 +1,11 @@
 """Main entrypoint for the API routes in of parma-analytics."""
+from typing import List
+
 from fastapi import FastAPI, HTTPException
 from starlette import status
 
 from parma_mining.github.client import GitHubClient
-from parma_mining.github.model import OrganizationModel
+from parma_mining.github.model import OrganizationModel, DiscoveryModel
 from dotenv import load_dotenv
 import os
 
@@ -33,3 +35,14 @@ def get_organization_details(org_name: str) -> OrganizationModel:
     """Endpoint to get detailed information about a given organization."""
     org_details = github_client.get_organization_details(org_name)
     return org_details
+
+
+@app.get(
+    "/search/orgs",
+    response_model=List[DiscoveryModel],
+    status_code=status.HTTP_200_OK,
+    responses={404: {"description": "Organization not found"}},
+)
+def search_organizations(query: str):
+    """Endpoint to search GitHub organizations based on a query."""
+    return github_client.search_organizations(query)

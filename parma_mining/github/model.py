@@ -30,3 +30,8 @@ class OrganizationModel(BaseModel):
     description: str
     url: str
     repos: List[RepositoryModel]
+
+
+class DiscoveryModel(BaseModel):
+    name: str
+    url: str
