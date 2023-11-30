@@ -12,3 +12,9 @@ variable "region" {
   description = "Google Cloud Region"
   type        = string
 }
+
+variable "GITHUB_TOKEN" {
+  description = "value"
+  type        = string
+  sensitive   = true
+}
