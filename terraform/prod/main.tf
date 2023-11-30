@@ -12,7 +12,7 @@ terraform {
   }
   backend "gcs" {
     bucket      = "la-famiglia-jst2324-tf-state"
-    prefix      = "terraform/state/prod"
+    prefix      = "terraform/state/prod/mining/github"
     credentials = "../.secrets/la-famiglia-parma-ai.json"
   }
 }
