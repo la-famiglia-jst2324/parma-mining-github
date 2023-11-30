@@ -7,7 +7,12 @@ resource "null_resource" "docker_build" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = "IMG=${var.region}-docker.pkg.dev/${var.project}/parma-registry/parma-mining-github:${var.env}-$(git rev-parse --short HEAD) && docker build -t $IMG ./../../ && docker push $IMG && echo $IMG > .image.name"
+    command     = <<EOT
+    IMG=${var.region}-docker.pkg.dev/${var.project}/parma-registry/parma-mining-github:${var.env}-$(git rev-parse --short HEAD)
+    docker build --build-arg GITHUB_TOKEN=${var.github_token} -t $IMG ./../../
+    docker push $IMG
+    echo $IMG > .image.name
+  EOT
   }
 
   triggers = {
@@ -34,6 +39,10 @@ resource "google_cloud_run_service" "parma_mining_github_cloud_run" {
         image = data.local_file.image_name.content
         ports {
           container_port = 8080
+        }
+        env {
+          name  = "GITHUB_TOKEN"
+          value = var.GITHUB_TOKEN
         }
       }
     }

@@ -33,4 +33,5 @@ module "main" {
   env              = "prod"
   project          = local.project
   region           = local.region
+  GITHUB_TOKEN     = var.GITHUB_TOKEN
 }
