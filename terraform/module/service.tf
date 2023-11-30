@@ -7,12 +7,7 @@ resource "null_resource" "docker_build" {
 
   provisioner "local-exec" {
     working_dir = path.module
-    command     = <<EOT
-    IMG=${var.region}-docker.pkg.dev/${var.project}/parma-registry/parma-mining-github:${var.env}-$(git rev-parse --short HEAD)
-    docker build --build-arg GITHUB_TOKEN=${var.github_token} -t $IMG ./../../
-    docker push $IMG
-    echo $IMG > .image.name
-  EOT
+    command     = "IMG=${var.region}-docker.pkg.dev/${var.project}/parma-registry/parma-mining-github:${var.env}-$(git rev-parse --short HEAD) && docker build -t $IMG ./../../ && docker push $IMG && echo $IMG > .image.name"
   }
 
   triggers = {
