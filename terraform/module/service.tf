@@ -39,6 +39,10 @@ resource "google_cloud_run_service" "parma_mining_github_cloud_run" {
           name  = "GITHUB_TOKEN"
           value = var.GITHUB_TOKEN
         }
+        env {
+          name  = "FIREBASE_ADMIN_SDK"
+          value = var.FIREBASE_ADMIN_SDK
+        }
       }
     }
   }
