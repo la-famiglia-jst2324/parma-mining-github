@@ -574,3 +574,4 @@ $RECYCLE.BIN/
 
 # [CUSTOMIZATIONS]
 .vscode
+.secrets/
