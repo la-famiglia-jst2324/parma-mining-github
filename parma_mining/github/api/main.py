@@ -5,7 +5,12 @@ from fastapi import FastAPI, HTTPException
 from starlette import status
 
 from parma_mining.github.client import GitHubClient
-from parma_mining.github.model import OrganizationModel, DiscoveryModel
+from parma_mining.github.model import (
+    OrganizationModel,
+    DiscoveryModel,
+    CompaniesRequest,
+    OrganizationsResponse,
+)
 from dotenv import load_dotenv
 import os
 
@@ -25,16 +30,20 @@ def root():
     return {"welcome": "at parma-mining-github"}
 
 
-@app.get(
-    "/organization/{org_name}",
-    response_model=OrganizationModel,
+@app.post(
+    "/organization",
+    response_model=OrganizationsResponse,
     status_code=status.HTTP_200_OK,
-    responses={404: {"description": "Organization not found"}},
 )
-def get_organization_details(org_name: str) -> OrganizationModel:
-    """Endpoint to get detailed information about a given organization."""
-    org_details = github_client.get_organization_details(org_name)
-    return org_details
+def get_organization_details(companies: CompaniesRequest) -> OrganizationsResponse:
+    """Endpoint to get detailed information about a dict of organizations."""
+    all_org_details = []
+    for company_name, handles in companies.companies.items():
+        for handle in handles:
+            org_details = github_client.get_organization_details(handle)
+            all_org_details.append(org_details)
+
+    return OrganizationsResponse(organizations=all_org_details)
 
 
 @app.get(

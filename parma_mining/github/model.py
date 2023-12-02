@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 
 
 class RepositoryModel(BaseModel):
@@ -35,3 +35,11 @@ class OrganizationModel(BaseModel):
 class DiscoveryModel(BaseModel):
     name: str
     url: str
+
+
+class CompaniesRequest(BaseModel):
+    companies: Dict[str, List[str]]
+
+
+class OrganizationsResponse(BaseModel):
+    organizations: List[OrganizationModel]
