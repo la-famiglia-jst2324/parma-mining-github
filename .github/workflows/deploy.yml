@@ -1,0 +1,19 @@
+name: Deploy
+permissions: write-all
+on:
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+defaults:
+  run:
+    shell: bash -el {0}
+
+jobs:
+  dummy_pr_test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy PR Test
+        run: exit 0
