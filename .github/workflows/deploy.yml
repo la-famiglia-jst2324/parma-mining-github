@@ -16,4 +16,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dummy PR Test
-        run: exit 0
+        run: echo "Test"
