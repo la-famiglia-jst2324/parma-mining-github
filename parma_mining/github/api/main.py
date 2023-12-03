@@ -50,7 +50,6 @@ def get_organization_details(companies: CompaniesRequest) -> OrganizationsRespon
     "/search/orgs",
     response_model=List[DiscoveryModel],
     status_code=status.HTTP_200_OK,
-    responses={404: {"description": "Organization not found"}},
 )
 def search_organizations(query: str):
     """Endpoint to search GitHub organizations based on a query."""
