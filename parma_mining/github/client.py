@@ -54,9 +54,7 @@ class GitHubClient:
 
             return OrganizationModel.model_validate(org_info)
         except GithubException as e:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
-            )
+            raise GithubException
 
     def search_organizations(self, query: str) -> List[DiscoveryModel]:
         try:
