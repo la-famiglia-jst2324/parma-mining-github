@@ -4,7 +4,7 @@ from pickle import NONE
 import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin.exceptions import FirebaseError
-from typing import List, Dict, Any
+from typing import Any
 
 
 class FirestoreService:
@@ -22,15 +22,17 @@ class FirestoreService:
             # Depending on the use case, you might want to re-raise the exception or handle it differently
 
     def add_new_data_source_and_company(
-        self, data_source: str, company: str, page_id: Dict[str, Any]
-    ) -> None:
+        self, data_source: str, company: str, page_id: dict[str, Any]
+    ) -> bool:
         try:
             doc_ref = self.db.collection(data_source).document(company)
             doc_ref.set(page_id)
+            return True
         except FirebaseError as e:
             print(f"Error creating new data source: {e}")
+            return False
 
-    def get_all_data_sources(self) -> List[str]:
+    def get_all_data_sources(self) -> list[str]:
         try:
             collections = self.db.collections()
             data_sources = [collection.id for collection in collections]
@@ -39,7 +41,7 @@ class FirestoreService:
             print(f"Error getting all data sources: {e}")
             return []
 
-    def get_all_companies(self, data_source: str) -> List[str]:
+    def get_all_companies(self, data_source: str) -> list[str]:
         companies = []
         try:
             companies_ref = self.db.collection(data_source)
@@ -64,8 +66,8 @@ class FirestoreService:
         data_source: str,
         company: str,
         page_id: str,
-        raw_data_content: Dict[str, Any],
-    ) -> None:
+        raw_data_content: dict[str, Any],
+    ) -> bool:
         try:
             doc_ref = (
                 self.db.collection(data_source)
@@ -74,5 +76,7 @@ class FirestoreService:
                 .document("raw_data")
             )
             doc_ref.set(raw_data_content)
+            return True
         except FirebaseError as e:
             print(f"Error adding new raw data: {e}")
+            return False
