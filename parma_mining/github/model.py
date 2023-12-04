@@ -39,7 +39,3 @@ class DiscoveryModel(BaseModel):
 
 class CompaniesRequest(BaseModel):
     companies: Dict[str, List[str]]
-
-
-class OrganizationsResponse(BaseModel):
-    organizations: List[OrganizationModel]

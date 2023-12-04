@@ -9,7 +9,6 @@ from parma_mining.github.model import (
     OrganizationModel,
     DiscoveryModel,
     CompaniesRequest,
-    OrganizationsResponse,
 )
 from dotenv import load_dotenv
 import os
@@ -31,11 +30,11 @@ def root():
 
 
 @app.post(
-    "/organization",
-    response_model=OrganizationsResponse,
+    "/organizations",
+    response_model=List[OrganizationModel],
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest) -> OrganizationsResponse:
+def get_organization_details(companies: CompaniesRequest) -> List[OrganizationModel]:
     """Endpoint to get detailed information about a dict of organizations."""
     all_org_details = []
     for company_name, handles in companies.companies.items():
@@ -43,7 +42,7 @@ def get_organization_details(companies: CompaniesRequest) -> OrganizationsRespon
             org_details = github_client.get_organization_details(handle)
             all_org_details.append(org_details)
 
-    return OrganizationsResponse(organizations=all_org_details)
+    return all_org_details
 
 
 @app.get(
