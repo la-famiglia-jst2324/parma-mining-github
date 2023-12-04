@@ -42,14 +42,17 @@ class FirestoreService:
     # Add a new data_source along with company without new page
     def add_new_data_source_and_company(self, data_source: str, company: str) -> bool:
         try:
-            doc_ref = self.db.collection(data_source).document(company)
-            page_id = self.get_next_page_number(data_source, company)
-            page_fields = {
-                "last_modified": firestore.SERVER_TIMESTAMP,
-                "last_modified_page": page_id,
-            }
-            doc_ref.set(page_fields)
-            return True
+            if self.check_company_exists(data_source, company):
+                return True
+            else:
+                doc_ref = self.db.collection(data_source).document(company)
+                page_id = self.get_next_page_number(data_source, company)
+                page_fields = {
+                    "last_modified": firestore.SERVER_TIMESTAMP,
+                    "last_modified_page": page_id,
+                }
+                doc_ref.set(page_fields)
+                return True
         except FirebaseError as e:
             print(f"Error creating new data source: {e}")
             return False
