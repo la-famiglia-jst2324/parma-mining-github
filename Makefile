@@ -15,6 +15,7 @@ install:
 	# execute the following two steps manually
 	# micromamba activate parma-mining-github  # Activate the new environment
 	# pip install -e . # Install the project in editable mode
+	pip install firebase-admin
 
 dev:
 	uvicorn parma_mining.github.api:app --reload

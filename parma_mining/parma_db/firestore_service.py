@@ -21,12 +21,34 @@ class FirestoreService:
             print(f"Error initializing Firebase: {e}")
             # Depending on the use case, you might want to re-raise the exception or handle it differently
 
-    def add_new_data_source_and_company(
-        self, data_source: str, company: str, page_id: dict[str, Any]
-    ) -> bool:
+    def get_next_page_number(self, data_source: str, company: str) -> int:
+        company_ref = self.db.collection(data_source).document(company)
+
+        # Fetch the last modified page number
+        company_doc = company_ref.get()
+        if company_doc.exists:
+            company_data = company_doc.to_dict()
+            last_page = company_data.get("last_modified_page")
+            if last_page:
+                # Extract the number from the string 'pageX' and increment it
+                page_number = last_page + 1
+            else:
+                page_number = 1
+        else:
+            page_number = 0
+
+        return page_number
+
+    # Add a new data_source along with company without new page
+    def add_new_data_source_and_company(self, data_source: str, company: str) -> bool:
         try:
             doc_ref = self.db.collection(data_source).document(company)
-            doc_ref.set(page_id)
+            page_id = self.get_next_page_number(data_source, company)
+            page_fields = {
+                "last_modified": firestore.SERVER_TIMESTAMP,
+                "last_modified_page": page_id,
+            }
+            doc_ref.set(page_fields)
             return True
         except FirebaseError as e:
             print(f"Error creating new data source: {e}")
@@ -65,18 +87,49 @@ class FirestoreService:
         self,
         data_source: str,
         company: str,
-        page_id: str,
         raw_data_content: dict[str, Any],
     ) -> bool:
         try:
-            doc_ref = (
-                self.db.collection(data_source)
-                .document(company)
-                .collection(page_id)
-                .document("raw_data")
+            page_id = self.get_next_page_number(data_source, company)
+            doc_ref = self.db.collection(data_source).document(company)
+            doc_ref.set(
+                {
+                    "last_modified": firestore.SERVER_TIMESTAMP,
+                    "last_modified_page": page_id,
+                }
             )
-            doc_ref.set(raw_data_content)
+            doc_ref.collection(page_id).document("raw_data").set(raw_data_content)
             return True
         except FirebaseError as e:
             print(f"Error adding new raw data: {e}")
             return False
+
+    def add_normalized_schema(
+        self,
+        data_source: str,
+        normalized_schema_content: dict[str, Any],
+    ) -> bool:
+        try:
+            doc_ref = (
+                self.db.collection(data_source)
+                .document("normalized_schema")
+                .collection("page0")
+            )
+            doc_ref.set(normalized_schema_content)
+            return True
+        except FirebaseError as e:
+            print(f"Error adding new raw data: {e}")
+            return False
+
+    def get_normalized_schema(self, data_source: str) -> dict:
+        try:
+            doc_ref = self.db.collection(data_source).document("normalized_schema")
+
+            doc = doc_ref.get()
+            if doc.exists:
+                return doc.to_dict()
+            else:
+                return {}
+        except FirebaseError as e:
+            print(f"An error occurred while fetching the normalized schema: {e}")
+            return {}
