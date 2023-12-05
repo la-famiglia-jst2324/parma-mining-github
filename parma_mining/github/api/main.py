@@ -1,9 +1,7 @@
 """Main entrypoint for the API routes in of parma-analytics."""
 from typing import List
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from starlette import status
-
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
     OrganizationModel,

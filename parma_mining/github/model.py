@@ -6,7 +6,7 @@ from typing import List, Dict, Optional
 class RepositoryModel(BaseModel):
     """Model to structure the JSON Data."""
 
-    name: Optional[str]
+    name: str
     description: Optional[str]
     stars: Optional[int]
     forks: Optional[int]
@@ -28,7 +28,7 @@ class RepositoryModel(BaseModel):
 class OrganizationModel(BaseModel):
     name: Optional[str]
     description: Optional[str]
-    url: Optional[str]
+    url: str
     repos: Optional[List[RepositoryModel]]
 
 
