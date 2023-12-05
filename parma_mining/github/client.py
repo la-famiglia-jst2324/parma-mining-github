@@ -1,8 +1,10 @@
+from typing import List
+
 from fastapi import HTTPException
 from github import Github, GithubException, Auth
 from starlette import status
 
-from parma_mining.github.model import OrganizationModel, RepositoryModel
+from parma_mining.github.model import OrganizationModel, RepositoryModel, DiscoveryModel
 
 
 class GitHubClient:
@@ -52,6 +54,17 @@ class GitHubClient:
 
             return OrganizationModel.model_validate(org_info)
         except GithubException as e:
+            raise GithubException
+
+    def search_organizations(self, query: str) -> List[DiscoveryModel]:
+        try:
+            organizations = self.client.search_users(query + " type:org")
+            return [
+                DiscoveryModel.model_validate({"name": org.login, "url": org.html_url})
+                for org in organizations
+            ]
+        except GithubException as e:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error searching organizations",
             )

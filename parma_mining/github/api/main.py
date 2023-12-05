@@ -1,9 +1,13 @@
 """Main entrypoint for the API routes in of parma-analytics."""
-from fastapi import FastAPI, HTTPException
+from typing import List
+from fastapi import FastAPI
 from starlette import status
-
 from parma_mining.github.client import GitHubClient
-from parma_mining.github.model import OrganizationModel
+from parma_mining.github.model import (
+    OrganizationModel,
+    DiscoveryModel,
+    CompaniesRequest,
+)
 from dotenv import load_dotenv
 import os
 
@@ -23,13 +27,27 @@ def root():
     return {"welcome": "at parma-mining-github"}
 
 
-@app.get(
-    "/organization/{org_name}",
-    response_model=OrganizationModel,
+@app.post(
+    "/organizations",
+    response_model=List[OrganizationModel],
     status_code=status.HTTP_200_OK,
-    responses={404: {"description": "Organization not found"}},
 )
-def get_organization_details(org_name: str) -> OrganizationModel:
-    """Endpoint to get detailed information about a given organization."""
-    org_details = github_client.get_organization_details(org_name)
-    return org_details
+def get_organization_details(companies: CompaniesRequest) -> List[OrganizationModel]:
+    """Endpoint to get detailed information about a dict of organizations."""
+    all_org_details = []
+    for company_name, handles in companies.companies.items():
+        for handle in handles:
+            org_details = github_client.get_organization_details(handle)
+            all_org_details.append(org_details)
+
+    return all_org_details
+
+
+@app.get(
+    "/search/orgs",
+    response_model=List[DiscoveryModel],
+    status_code=status.HTTP_200_OK,
+)
+def search_organizations(query: str):
+    """Endpoint to search GitHub organizations based on a query."""
+    return github_client.search_organizations(query)
