@@ -1,4 +1,4 @@
-# parma-mining-github
+pa# parma-mining-github
 
 [![Chore](https://github.com/la-famiglia-jst2324/parma-mining-github/actions/workflows/chore.yml/badge.svg?branch=main)](https://github.com/la-famiglia-jst2324/parma-mining-github/actions/workflows/chore.yml)
 [![CI](https://github.com/la-famiglia-jst2324/parma-mining-github/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/la-famiglia-jst2324/parma-mining-github/actions/workflows/ci.yml)
