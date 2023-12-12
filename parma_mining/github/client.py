@@ -1,10 +1,9 @@
 from typing import List
-
 from fastapi import HTTPException
 from github import Github, GithubException, Auth
 from starlette import status
-
 from parma_mining.github.model import OrganizationModel, RepositoryModel, DiscoveryModel
+from parma_mining.github.normalization_map import GithubNormalizationMap
 
 
 class GitHubClient:

@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import Optional
 
 
 class RepositoryModel(BaseModel):
@@ -29,7 +29,7 @@ class OrganizationModel(BaseModel):
     name: Optional[str]
     description: Optional[str]
     url: str
-    repos: Optional[List[RepositoryModel]]
+    repos: Optional[list[RepositoryModel]]
 
 
 class DiscoveryModel(BaseModel):
@@ -38,4 +38,4 @@ class DiscoveryModel(BaseModel):
 
 
 class CompaniesRequest(BaseModel):
-    companies: Dict[str, List[str]]
+    companies: dict[str, dict[str, list[str]]]
