@@ -9,6 +9,7 @@ from parma_mining.github.model import (
     OrganizationModel,
     DiscoveryModel,
     CompaniesRequest,
+    ResponseModel,
 )
 from dotenv import load_dotenv
 import os
@@ -57,19 +58,23 @@ def initialize(source_id: int) -> str:
     response_model=List[OrganizationModel],
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest) -> List[OrganizationModel]:
+def get_organization_details(companies: CompaniesRequest):
     """Endpoint to get detailed information about a dict of organizations."""
-    all_org_details = []
     for company_id, company_data in companies.companies.items():
         for data_type, handles in company_data.items():
             for handle in handles:
                 if data_type == "name":
                     org_details = github_client.get_organization_details(handle)
-                    all_org_details.append(org_details)
+                    data = ResponseModel(
+                        source_name="Github",
+                        company_id=company_id,
+                        raw_data=org_details,
+                    )
+                    # Write data to db via endpoint in analytics backend
+                    analytics_client.feed_raw_data(data)
                 else:
                     # To be included in logging
                     print("Unsupported type error")
-    return all_org_details
 
 
 @app.get(
