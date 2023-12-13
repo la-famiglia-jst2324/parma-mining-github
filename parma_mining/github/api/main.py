@@ -1,15 +1,16 @@
 """Main entrypoint for the API routes in of parma-analytics."""
-from typing import List
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from starlette import status
+
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
-    OrganizationModel,
-    DiscoveryModel,
     CompaniesRequest,
+    DiscoveryModel,
+    OrganizationModel,
 )
-from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -29,10 +30,10 @@ def root():
 
 @app.post(
     "/organizations",
-    response_model=List[OrganizationModel],
+    response_model=list[OrganizationModel],
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest) -> List[OrganizationModel]:
+def get_organization_details(companies: CompaniesRequest) -> list[OrganizationModel]:
     """Endpoint to get detailed information about a dict of organizations."""
     all_org_details = []
     for company_name, handles in companies.companies.items():
@@ -45,7 +46,7 @@ def get_organization_details(companies: CompaniesRequest) -> List[OrganizationMo
 
 @app.get(
     "/search/orgs",
-    response_model=List[DiscoveryModel],
+    response_model=list[DiscoveryModel],
     status_code=status.HTTP_200_OK,
 )
 def search_organizations(query: str):

@@ -1,9 +1,12 @@
+from unittest.mock import MagicMock
+
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from starlette import status
-from unittest.mock import MagicMock
+
 from parma_mining.github.api.main import app
+from parma_mining.mining_common.const import HTTP_200, HTTP_404
 
 client = TestClient(app)
 
@@ -53,7 +56,7 @@ def test_get_organization_details(mock_github_client: MagicMock):
 
     response = client.post("/organizations", json=payload)
 
-    assert response.status_code == 200
+    assert response.status_code == HTTP_200
 
     assert response.json() == [
         {
@@ -153,4 +156,4 @@ def test_get_organization_details_bad_request(mocker):
     }
 
     response = client.post("/organizations", json=payload)
-    assert response.status_code == 404
+    assert response.status_code == HTTP_404
