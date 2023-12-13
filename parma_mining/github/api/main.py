@@ -55,7 +55,6 @@ def initialize(source_id: int) -> str:
 
 @app.post(
     "/companies",
-    response_model=List[OrganizationModel],
     status_code=status.HTTP_200_OK,
 )
 def get_organization_details(companies: CompaniesRequest):
@@ -71,10 +70,14 @@ def get_organization_details(companies: CompaniesRequest):
                         raw_data=org_details,
                     )
                     # Write data to db via endpoint in analytics backend
-                    analytics_client.feed_raw_data(data)
+                    try:
+                        analytics_client.feed_raw_data(data)
+                    except:
+                        print("Error writing to db")
                 else:
                     # To be included in logging
                     print("Unsupported type error")
+    return "done"
 
 
 @app.get(
