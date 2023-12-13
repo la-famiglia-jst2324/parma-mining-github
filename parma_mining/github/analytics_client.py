@@ -1,4 +1,3 @@
-# The duty of this file is to make necessary calls to Analytics API
 import httpx
 from dotenv import load_dotenv
 from parma_mining.github.model import ResponseModel
@@ -14,19 +13,18 @@ class AnalyticsClient:
     measurement_url = urllib.parse.urljoin(analytics_base, "/source-measurement")
     feed_raw_url = urllib.parse.urljoin(analytics_base, "/feed-raw-data")
 
-    def send_post_request(self, data):
-        api_endpoint = self.measurement_url
+    def send_post_request(self, api_endpoint, data):
         headers = {
             "Content-Type": "application/json",
         }
-        print(data)
+
         response = httpx.post(api_endpoint, json=data, headers=headers)
 
-        if response.status_code == 201:
-            return response.json().get("id")
+        if response.status_code in [200, 201]:
+            return response.json()
         else:
             raise Exception(
-                f"API request failed with status code {response.status_code}"
+                f"API request failed with status code {response.status_code}, response: {response.text}"
             )
 
     def register_measurements(self, mapping, parent_id=None, source_module_id=None):
@@ -42,9 +40,8 @@ class AnalyticsClient:
             if parent_id is not None:
                 measurement_data["parent_measurement_id"] = parent_id
 
-            measurement_data["source_measurement_id"] = self.send_post_request(
-                measurement_data
-            )
+            response = self.send_post_request(self.measurement_url, measurement_data)
+            measurement_data["source_measurement_id"] = response.get("id")
 
             # add the source measurement id to mapping
             field_mapping["source_measurement_id"] = measurement_data[
@@ -62,11 +59,6 @@ class AnalyticsClient:
         return result, mapping
 
     def feed_raw_data(self, input_data: ResponseModel):
-        api_endpoint = self.feed_raw_url
-        headers = {
-            "Content-Type": "application/json",
-        }
-
         organization_json = json.loads(input_data.raw_data.updated_model_dump())
 
         data = {
@@ -75,13 +67,4 @@ class AnalyticsClient:
             "raw_data": organization_json,
         }
 
-        response = httpx.post(api_endpoint, json=data, headers=headers)
-
-        if response.status_code == 201:
-            return response.json()
-        elif response.status_code == 404:
-            pass
-        else:
-            raise Exception(
-                f"API request failed with status code {response.status_code}"
-            )
+        return self.send_post_request(self.feed_raw_url, data)

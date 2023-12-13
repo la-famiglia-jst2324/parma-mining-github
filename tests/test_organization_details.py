@@ -63,8 +63,6 @@ def test_get_organization_details(
 
     response = client.post("/companies", json=payload)
 
-    print(response.json())
-
     mock_analytics_client.assert_called()
 
     assert response.status_code == 200
