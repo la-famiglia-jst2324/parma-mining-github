@@ -45,7 +45,7 @@ def mock_github_client(mocker) -> MagicMock:
 
 @pytest.fixture
 def mock_analytics_client(mocker) -> MagicMock:
-    """Mocking the GitHubClient's method to avoid actual API calls during testing."""
+    """Mocking the AnalyticClient's method to avoid actual API calls during testing."""
     mock = mocker.patch("parma_mining.github.api.main.AnalyticsClient.feed_raw_data")
     # No return value needed, but you can add side effects or exceptions if necessary
     return mock

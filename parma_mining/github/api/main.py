@@ -65,7 +65,7 @@ def get_organization_details(companies: CompaniesRequest):
                 if data_type == "name":
                     org_details = github_client.get_organization_details(handle)
                     data = ResponseModel(
-                        source_name="Github",
+                        source_name="github",
                         company_id=company_id,
                         raw_data=org_details,
                     )
