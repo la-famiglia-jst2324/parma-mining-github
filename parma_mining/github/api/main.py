@@ -1,19 +1,18 @@
 """Main entrypoint for the API routes in of parma-analytics."""
 import json
-from typing import List
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from starlette import status
+
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
-    OrganizationModel,
-    DiscoveryModel,
     CompaniesRequest,
+    DiscoveryModel,
     ResponseModel,
 )
-from dotenv import load_dotenv
-import os
-
 from parma_mining.github.normalization_map import GithubNormalizationMap
 
 load_dotenv()
@@ -72,7 +71,7 @@ def get_organization_details(companies: CompaniesRequest):
                     # Write data to db via endpoint in analytics backend
                     try:
                         analytics_client.feed_raw_data(data)
-                    except:
+                    except Exception:
                         print("Error writing to db")
                 else:
                     # To be included in logging
@@ -82,7 +81,7 @@ def get_organization_details(companies: CompaniesRequest):
 
 @app.get(
     "/search/companies",
-    response_model=List[DiscoveryModel],
+    response_model=list[DiscoveryModel],
     status_code=status.HTTP_200_OK,
 )
 def search_organizations(query: str):
