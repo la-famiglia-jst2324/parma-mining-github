@@ -1,0 +1,73 @@
+import json
+import os
+import urllib.parse
+
+import httpx
+from dotenv import load_dotenv
+
+from parma_mining.github.model import ResponseModel
+
+
+class AnalyticsClient:
+    load_dotenv()
+    analytics_base = str(os.getenv("ANALYTICS_BASE_URL") or "")
+
+    measurement_url = urllib.parse.urljoin(analytics_base, "/source-measurement")
+    feed_raw_url = urllib.parse.urljoin(analytics_base, "/feed-raw-data")
+
+    def send_post_request(self, api_endpoint, data):
+        headers = {
+            "Content-Type": "application/json",
+        }
+
+        response = httpx.post(api_endpoint, json=data, headers=headers)
+
+        if response.status_code in [200, 201]:
+            return response.json()
+        else:
+            raise Exception(
+                f"API request failed with status code {response.status_code},"
+                f"response: {response.text}"
+            )
+
+    def register_measurements(self, mapping, parent_id=None, source_module_id=None):
+        result = []
+
+        for field_mapping in mapping["Mappings"]:
+            measurement_data = {
+                "source_module_id": source_module_id,
+                "type": field_mapping["DataType"],
+                "measurement_name": field_mapping["MeasurementName"],
+            }
+
+            if parent_id is not None:
+                measurement_data["parent_measurement_id"] = parent_id
+
+            response = self.send_post_request(self.measurement_url, measurement_data)
+            measurement_data["source_measurement_id"] = response.get("id")
+
+            # add the source measurement id to mapping
+            field_mapping["source_measurement_id"] = measurement_data[
+                "source_measurement_id"
+            ]
+
+            if "NestedMappings" in field_mapping:
+                nested_measurements = self.register_measurements(
+                    {"Mappings": field_mapping["NestedMappings"]},
+                    parent_id=measurement_data["source_measurement_id"],
+                    source_module_id=source_module_id,
+                )[0]
+                result.extend(nested_measurements)
+            result.append(measurement_data)
+        return result, mapping
+
+    def feed_raw_data(self, input_data: ResponseModel):
+        organization_json = json.loads(input_data.raw_data.updated_model_dump())
+
+        data = {
+            "source_name": input_data.source_name,
+            "company_id": input_data.company_id,
+            "raw_data": organization_json,
+        }
+
+        return self.send_post_request(self.feed_raw_url, data)

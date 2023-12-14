@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -31,6 +32,19 @@ class OrganizationModel(BaseModel):
     url: str
     repos: list[RepositoryModel] | None
 
+    def updated_model_dump(self) -> str:
+        """Dump the CompanyModel instance to a JSON string."""
+        # Convert datetime objects to string representation
+        json_serializable_dict = self.model_dump()
+        repos = []
+        if self.repos:
+            for repo in self.repos:
+                if repo:
+                    repos.append(repo.model_dump())
+        json_serializable_dict["repos"] = repos
+
+        return json.dumps(json_serializable_dict, default=str)
+
 
 class DiscoveryModel(BaseModel):
     name: str | None
@@ -38,4 +52,10 @@ class DiscoveryModel(BaseModel):
 
 
 class CompaniesRequest(BaseModel):
-    companies: dict[str, list[str]]
+    companies: dict[str, dict[str, list[str]]]
+
+
+class ResponseModel(BaseModel):
+    source_name: str
+    company_id: str
+    raw_data: OrganizationModel

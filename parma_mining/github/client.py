@@ -9,7 +9,8 @@ class GitHubClient:
     def __init__(self, token: str):
         self.client = Github(auth=Auth.Token(token))
 
-    # Get organization details and statistics on all repositories of the organization
+    # Get organization details and statistics
+    # on all repositories of the organization
     def get_organization_details(self, org_name: str) -> OrganizationModel:
         try:
             organization = self.client.get_organization(org_name)
