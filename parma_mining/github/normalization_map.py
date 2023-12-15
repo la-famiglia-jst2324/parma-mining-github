@@ -1,6 +1,6 @@
 class GithubNormalizationMap:
     map_json = {
-        "Source": "GitHub",
+        "Source": "github",
         "Mappings": [
             {
                 "SourceField": "name",
