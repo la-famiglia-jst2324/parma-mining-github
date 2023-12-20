@@ -3,8 +3,7 @@ import json
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from starlette import status
+from fastapi import FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
@@ -19,22 +18,20 @@ load_dotenv()
 
 app = FastAPI()
 
-github_token = os.getenv("GITHUB_TOKEN", "default-test-token")
+github_token = str(os.getenv("GITHUB_TOKEN", "default-test-token"))
 
 github_client = GitHubClient(github_token)
 analytics_client = AnalyticsClient()
 normalization = GithubNormalizationMap()
 
 
-# root endpoint
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
     """Root endpoint for the API."""
     return {"welcome": "at parma-mining-github"}
 
 
-# initialization endpoint
-@app.get("/initialize", status_code=200)
+@app.get("/initialize", status_code=status.HTTP_200_OK)
 def initialize(source_id: int) -> str:
     """Initialization endpoint for the API."""
     # init frequency

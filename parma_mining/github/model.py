@@ -1,3 +1,4 @@
+"""Model for the GitHub data."""
 import json
 from datetime import datetime
 
@@ -5,7 +6,7 @@ from pydantic import BaseModel
 
 
 class RepositoryModel(BaseModel):
-    """Model to structure the JSON Data."""
+    """Repository model for GitHub data."""
 
     name: str
     description: str | None
@@ -27,6 +28,8 @@ class RepositoryModel(BaseModel):
 
 
 class OrganizationModel(BaseModel):
+    """Organization model for GitHub data."""
+
     name: str | None
     description: str | None
     url: str
@@ -47,15 +50,21 @@ class OrganizationModel(BaseModel):
 
 
 class DiscoveryModel(BaseModel):
+    """Discovery model for GitHub data."""
+
     name: str | None
     url: str | None
 
 
 class CompaniesRequest(BaseModel):
+    """Companies request model for GitHub data."""
+
     companies: dict[str, dict[str, list[str]]]
 
 
 class ResponseModel(BaseModel):
+    """Response model for GitHub data."""
+
     source_name: str
     company_id: str
     raw_data: OrganizationModel

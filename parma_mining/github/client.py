@@ -1,17 +1,22 @@
-from fastapi import HTTPException
+"""GitHub client module."""
+from fastapi import HTTPException, status
 from github import Auth, Github, GithubException
-from starlette import status
 
 from parma_mining.github.model import DiscoveryModel, OrganizationModel, RepositoryModel
 
 
 class GitHubClient:
+    """GitHubClient class is used to fetch data from GitHub."""
+
     def __init__(self, token: str):
+        """Initialize the GitHub client."""
         self.client = Github(auth=Auth.Token(token))
 
-    # Get organization details and statistics
-    # on all repositories of the organization
     def get_organization_details(self, org_name: str) -> OrganizationModel:
+        """Get organization details and statistics.
+
+        On all repositories of the organization.
+        """
         try:
             organization = self.client.get_organization(org_name)
             org_info = {
@@ -56,6 +61,7 @@ class GitHubClient:
             raise GithubException
 
     def search_organizations(self, query: str) -> list[DiscoveryModel]:
+        """Search organizations on GitHub."""
         try:
             organizations = self.client.search_users(query + " type:org")
             return [

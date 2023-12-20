@@ -1,3 +1,7 @@
+"""This module contains the AnalyticsClient class.
+
+AnalyticsClient class is used to send data to the analytics service.
+"""
 import json
 import os
 import urllib.parse
@@ -6,9 +10,12 @@ import httpx
 from dotenv import load_dotenv
 
 from parma_mining.github.model import ResponseModel
+from parma_mining.mining_common.const import HTTP_200, HTTP_201
 
 
 class AnalyticsClient:
+    """AnalyticsClient class is used to send data to the analytics service."""
+
     load_dotenv()
     analytics_base = str(os.getenv("ANALYTICS_BASE_URL") or "")
 
@@ -16,13 +23,14 @@ class AnalyticsClient:
     feed_raw_url = urllib.parse.urljoin(analytics_base, "/feed-raw-data")
 
     def send_post_request(self, api_endpoint, data):
+        """Send a POST request to the given API endpoint with the given data."""
         headers = {
             "Content-Type": "application/json",
         }
 
         response = httpx.post(api_endpoint, json=data, headers=headers)
 
-        if response.status_code in [200, 201]:
+        if response.status_code in [HTTP_200, HTTP_201]:
             return response.json()
         else:
             raise Exception(
@@ -31,6 +39,7 @@ class AnalyticsClient:
             )
 
     def register_measurements(self, mapping, parent_id=None, source_module_id=None):
+        """Register the given mapping as a measurement."""
         result = []
 
         for field_mapping in mapping["Mappings"]:
@@ -62,6 +71,7 @@ class AnalyticsClient:
         return result, mapping
 
     def feed_raw_data(self, input_data: ResponseModel):
+        """Feed the raw data to the analytics service."""
         organization_json = json.loads(input_data.raw_data.updated_model_dump())
 
         data = {

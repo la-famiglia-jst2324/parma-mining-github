@@ -1,4 +1,9 @@
+"""Normalization map for github data."""
+
+
 class GithubNormalizationMap:
+    """Normalization map for github data."""
+
     map_json = {
         "Source": "github",
         "Mappings": [
@@ -108,5 +113,6 @@ class GithubNormalizationMap:
         ],
     }
 
-    def get_normalization_map(self):
+    def get_normalization_map(self) -> dict:
+        """Return the normalization map."""
         return self.map_json
