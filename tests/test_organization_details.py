@@ -47,15 +47,27 @@ def mock_github_client(mocker) -> MagicMock:
 
 
 @pytest.fixture
-def mock_analytics_client(mocker) -> MagicMock:
+def mock_analytics_client_feed_data(mocker) -> MagicMock:
     """Mocking the AnalyticClient's method to avoid actual API calls during testing."""
     mock = mocker.patch("parma_mining.github.api.main.AnalyticsClient.feed_raw_data")
-    # No return value needed, but you can add side effects or exceptions if necessary
+
+    return mock
+
+
+@pytest.fixture
+def mock_analytics_client_task_status(mocker) -> MagicMock:
+    """Mocking the AnalyticClient's method to avoid actual API calls during testing."""
+    mock = mocker.patch(
+        "parma_mining.github.api.main.AnalyticsClient.update_task_status"
+    )
+
     return mock
 
 
 def test_get_organization_details(
-    mock_github_client: MagicMock, mock_analytics_client: MagicMock
+    mock_github_client: MagicMock,
+    mock_analytics_client_feed_data: MagicMock,
+    mock_analytics_client_task_status: MagicMock,
 ):
     payload = {
         "companies": {
@@ -63,10 +75,12 @@ def test_get_organization_details(
             "Example_id2": {"name": ["personio"]},
         }
     }
+    task_id = 123
 
-    response = client.post("/companies", json=payload)
+    response = client.post("/companies", json=payload, params={"task_id": task_id})
 
-    mock_analytics_client.assert_called()
+    mock_analytics_client_feed_data.assert_called()
+    mock_analytics_client_task_status.assert_called()
 
     assert response.status_code == HTTP_200
 
@@ -85,6 +99,7 @@ def test_get_organization_details_bad_request(mocker):
             "Example_id2": {"name": ["personio"]},
         }
     }
+    task_id = 123
+    response = client.post("/companies", json=payload, params={"task_id": task_id})
 
-    response = client.post("/companies", json=payload)
     assert response.status_code == HTTP_404

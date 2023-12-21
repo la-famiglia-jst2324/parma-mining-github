@@ -53,7 +53,7 @@ def initialize(source_id: int) -> str:
     "/companies",
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest):
+def get_organization_details(companies: CompaniesRequest, task_id: int):
     """Endpoint to get detailed information about a dict of organizations."""
     for company_id, company_data in companies.companies.items():
         for data_type, handles in company_data.items():
@@ -73,11 +73,13 @@ def get_organization_details(companies: CompaniesRequest):
                 else:
                     # To be included in logging
                     print("Unsupported type error")
+
+    analytics_client.update_task_status(task_id, "success", "tbd")
     return "done"
 
 
 @app.get(
-    "/search/companies",
+    "/discover",
     response_model=list[DiscoveryModel],
     status_code=status.HTTP_200_OK,
 )

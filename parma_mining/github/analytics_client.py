@@ -21,6 +21,7 @@ class AnalyticsClient:
 
     measurement_url = urllib.parse.urljoin(analytics_base, "/source-measurement")
     feed_raw_url = urllib.parse.urljoin(analytics_base, "/feed-raw-data")
+    update_task_status_url = urllib.parse.urljoin(analytics_base, "/update-task-status")
 
     def send_post_request(self, api_endpoint, data):
         """Send a POST request to the given API endpoint with the given data."""
@@ -81,3 +82,25 @@ class AnalyticsClient:
         }
 
         return self.send_post_request(self.feed_raw_url, data)
+
+    def update_task_status(self, task_id: int, status: str, result_summary: str):
+        """Update the status of a task in the analytics service."""
+        task_information = {
+            "task_id": task_id,
+            "status": status,
+            "result_summary": result_summary,
+        }
+
+        headers = {"Content-Type": "application/json"}
+
+        response = httpx.put(
+            self.update_task_status_url, json=task_information, headers=headers
+        )
+
+        if response.status_code == HTTP_200:
+            return response.json()
+        else:
+            raise Exception(
+                f"Failed to update task status. Returned code {response.status_code},"
+                f"response: {response.text}"
+            )
