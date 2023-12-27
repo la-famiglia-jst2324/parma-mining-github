@@ -3,9 +3,10 @@ import json
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, status
+from fastapi import Depends, FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
+from parma_mining.github.api.dependencies.auth import authenticate
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
     CompaniesRequest,
@@ -32,7 +33,7 @@ def root():
 
 
 @app.get("/initialize", status_code=status.HTTP_200_OK)
-def initialize(source_id: int) -> str:
+def initialize(source_id: int, token: str = Depends(authenticate)) -> str:
     """Initialization endpoint for the API."""
     # init frequency
     time = "weekly"
@@ -53,7 +54,9 @@ def initialize(source_id: int) -> str:
     "/companies",
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest):
+def get_organization_details(
+    companies: CompaniesRequest, token: str = Depends(authenticate)
+):
     """Endpoint to get detailed information about a dict of organizations."""
     for company_id, company_data in companies.companies.items():
         for data_type, handles in company_data.items():
@@ -81,6 +84,6 @@ def get_organization_details(companies: CompaniesRequest):
     response_model=list[DiscoveryModel],
     status_code=status.HTTP_200_OK,
 )
-def search_organizations(query: str):
+def search_organizations(query: str, token: str = Depends(authenticate)):
     """Endpoint to search GitHub organizations based on a query."""
     return github_client.search_organizations(query)

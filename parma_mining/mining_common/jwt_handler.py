@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class JWTHandler:
     """A handler for verifying JWTs."""
 
-    SHARED_SECRET_KEY: str = str(os.getenv("ANALYTICS_BASE_URL") or "SHARED_SECRET_KEY")
+    SHARED_SECRET_KEY: str = str(os.getenv("SHARED_SECRET_KEY") or "SHARED_SECRET_KEY")
     ALGORITHM: str = "HS256"
 
     @staticmethod
