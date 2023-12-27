@@ -34,6 +34,5 @@ module "main" {
   project                       = local.project
   region                        = local.region
   GITHUB_TOKEN                  = var.GITHUB_TOKEN
-  FIREBASE_ADMINSDK_CERTIFICATE = var.FIREBASE_ADMINSDK_CERTIFICATE
   ANALYTICS_BASE_URL            = var.ANALYTICS_BASE_URL
 }

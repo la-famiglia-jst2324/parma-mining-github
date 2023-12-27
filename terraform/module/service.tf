@@ -40,10 +40,6 @@ resource "google_cloud_run_service" "parma_mining_github_cloud_run" {
           value = var.GITHUB_TOKEN
         }
         env {
-          name  = "FIREBASE_ADMINSDK_CERTIFICATE"
-          value = var.FIREBASE_ADMINSDK_CERTIFICATE
-        }
-        env {
           name  = "ANALYTICS_BASE_URL"
           value = var.ANALYTICS_BASE_URL
         }
