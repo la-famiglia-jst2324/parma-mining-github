@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def authenticate(
-    authorization: str = Header(...),
+    authorization: str = Header(None),
 ) -> str:
     """Authenticate the incoming request using the JWT in the Authorization header.
 
@@ -29,7 +29,15 @@ def authenticate(
 
     Raises:
         HTTPException: If the JWT is invalid or expired.
+        HTTPException: If the Authorization header is missing.
     """
+    if authorization is None:
+        logger.error("Authorization header is required!")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header is required!",
+        )
+
     token = (
         authorization.split(" ")[1]
         if authorization.startswith("Bearer ")

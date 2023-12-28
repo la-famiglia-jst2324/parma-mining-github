@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def mock_authenticate(
-    authorization: str = Header(...),
+    authorization: str = Header(None),
 ) -> str:
     """Authenticate the incoming request using the JWT in the Authorization header.
 
