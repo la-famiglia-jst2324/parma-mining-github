@@ -1,9 +1,8 @@
 from unittest.mock import MagicMock
 
 import pytest
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
-from starlette import status
 
 from parma_mining.github.api.dependencies.auth import authenticate
 from parma_mining.github.api.dependencies.mock_auth import mock_authenticate
