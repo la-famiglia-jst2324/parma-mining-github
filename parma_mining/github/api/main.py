@@ -40,7 +40,7 @@ def initialize(source_id: int, token: str = Depends(authenticate)) -> str:
     normalization_map = GithubNormalizationMap().get_normalization_map()
     # register the measurements to analytics
     analytics_client.register_measurements(
-        normalization_map, source_module_id=source_id
+        token=token, mapping=normalization_map, source_module_id=source_id
     )
 
     # set and return results
@@ -70,7 +70,7 @@ def get_organization_details(
                     )
                     # Write data to db via endpoint in analytics backend
                     try:
-                        analytics_client.feed_raw_data(data)
+                        analytics_client.feed_raw_data(token, data)
                     except Exception:
                         print("Error writing to db")
                 else:
