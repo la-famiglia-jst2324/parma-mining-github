@@ -5,10 +5,23 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from starlette import status
 
+from parma_mining.github.api.dependencies.auth import authenticate
+from parma_mining.github.api.dependencies.mock_auth import mock_authenticate
 from parma_mining.github.api.main import app
 from parma_mining.mining_common.const import HTTP_200, HTTP_404
 
-client = TestClient(app)
+# client = TestClient(app)
+
+
+@pytest.fixture
+def client():
+    assert app
+    app.dependency_overrides.update(
+        {
+            authenticate: mock_authenticate,
+        }
+    )
+    return TestClient(app)
 
 
 @pytest.fixture
@@ -55,7 +68,7 @@ def mock_analytics_client(mocker) -> MagicMock:
 
 
 def test_get_organization_details(
-    mock_github_client: MagicMock, mock_analytics_client: MagicMock
+    mock_github_client: MagicMock, mock_analytics_client: MagicMock, client: TestClient
 ):
     payload = {
         "companies": {
@@ -64,14 +77,15 @@ def test_get_organization_details(
         }
     }
 
-    response = client.post("/companies", json=payload)
+    headers = {"Authorization": "Bearer test"}
+    response = client.post("/companies", json=payload, headers=headers)
 
     mock_analytics_client.assert_called()
 
     assert response.status_code == HTTP_200
 
 
-def test_get_organization_details_bad_request(mocker):
+def test_get_organization_details_bad_request(mocker, client: TestClient):
     mocker.patch(
         "parma_mining.github.api.main.GitHubClient.get_organization_details",
         side_effect=HTTPException(
@@ -86,5 +100,6 @@ def test_get_organization_details_bad_request(mocker):
         }
     }
 
-    response = client.post("/companies", json=payload)
+    headers = {"Authorization": "Bearer test"}
+    response = client.post("/companies", json=payload, headers=headers)
     assert response.status_code == HTTP_404
