@@ -10,8 +10,6 @@ from parma_mining.github.api.dependencies.mock_auth import mock_authenticate
 from parma_mining.github.api.main import app
 from parma_mining.mining_common.const import HTTP_200, HTTP_404
 
-# client = TestClient(app)
-
 
 @pytest.fixture
 def client():
