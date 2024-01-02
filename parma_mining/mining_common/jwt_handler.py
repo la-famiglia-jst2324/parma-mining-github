@@ -34,8 +34,8 @@ class JWTHandler:
             )
             return True
         except ExpiredSignatureError:
-            logging.error("JWT has expired.")
+            logger.error("JWT has expired.")
         except JWTError:
-            logging.error("Invalid JWT, unable to decode.")
+            logger.error("Invalid JWT, unable to decode.")
 
         return False

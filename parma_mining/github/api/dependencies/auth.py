@@ -45,7 +45,7 @@ def authenticate(
     )
     is_verified: bool = JWTHandler.verify_jwt(token)
     if is_verified is False:
-        logging.error("Invalid shared token or expired token")
+        logger.error("Invalid shared token or expired token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid shared token or expired token",
