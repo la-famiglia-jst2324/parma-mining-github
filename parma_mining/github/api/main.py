@@ -65,12 +65,11 @@ def get_organization_details(companies: CompaniesRequest):
                         company_id=company_id,
                         raw_data=org_details,
                     )
-                    return data
                     # Write data to db via endpoint in analytics backend
-                    # try:
-                    #    analytics_client.feed_raw_data(data)
-                    # except Exception:
-                    #    print("Error writing to db")
+                    try:
+                        analytics_client.feed_raw_data(data)
+                    except Exception:
+                        print("Error writing to db")
                 else:
                     # To be included in logging
                     print("Unsupported type error")
