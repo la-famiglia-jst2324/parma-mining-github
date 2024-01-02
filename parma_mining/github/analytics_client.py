@@ -3,6 +3,7 @@
 AnalyticsClient class is used to send data to the analytics service.
 """
 import json
+import logging
 import os
 import urllib.parse
 
@@ -11,6 +12,8 @@ from dotenv import load_dotenv
 
 from parma_mining.github.model import ResponseModel
 from parma_mining.mining_common.const import HTTP_200, HTTP_201
+
+logger = logging.getLogger(__name__)
 
 
 class AnalyticsClient:
@@ -34,6 +37,10 @@ class AnalyticsClient:
         if response.status_code in [HTTP_200, HTTP_201]:
             return response.json()
         else:
+            logger.error(
+                f"API request failed with status code {response.status_code},"
+                f"response: {response.text}"
+            )
             raise Exception(
                 f"API request failed with status code {response.status_code},"
                 f"response: {response.text}"
@@ -54,6 +61,11 @@ class AnalyticsClient:
 
             if parent_id is not None:
                 measurement_data["parent_measurement_id"] = parent_id
+            else:
+                logger.debug(
+                    f"No parent id provided for "
+                    f"measurement {measurement_data['measurement_name']}"
+                )
 
             response = self.send_post_request(
                 token, self.measurement_url, measurement_data

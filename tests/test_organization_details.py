@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import MagicMock
 
 import pytest
@@ -19,6 +20,9 @@ def client():
         }
     )
     return TestClient(app)
+
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture

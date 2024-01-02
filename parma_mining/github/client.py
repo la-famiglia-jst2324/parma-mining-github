@@ -1,8 +1,12 @@
 """GitHub client module."""
+import logging
+
 from fastapi import HTTPException, status
 from github import Auth, Github, GithubException
 
 from parma_mining.github.model import DiscoveryModel, OrganizationModel, RepositoryModel
+
+logger = logging.getLogger(__name__)
 
 
 class GitHubClient:
@@ -57,7 +61,8 @@ class GitHubClient:
                 org_info["repos"].append(parsed_repo)
 
             return OrganizationModel.model_validate(org_info)
-        except GithubException:
+        except GithubException as e:
+            logger.error(f"Error fetching organization details for {org_name}: {e}")
             raise GithubException
 
     def search_organizations(self, query: str) -> list[DiscoveryModel]:
@@ -68,7 +73,8 @@ class GitHubClient:
                 DiscoveryModel.model_validate({"name": org.login, "url": org.html_url})
                 for org in organizations
             ]
-        except GithubException:
+        except GithubException as e:
+            logger.error(f"Error searching organizations for {query}: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error searching organizations",
