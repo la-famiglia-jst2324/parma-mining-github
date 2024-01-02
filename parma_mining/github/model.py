@@ -21,9 +21,7 @@ class RepositoryModel(BaseModel):
     svn_url: str | None
     homepage: str | None
     size: int | None
-    stargazers_count: int | None
     watchers_count: int | None
-    forks_count: int | None
     open_issues_count: int | None
 
 
@@ -34,6 +32,11 @@ class OrganizationModel(BaseModel):
     description: str | None
     url: str
     repos: list[RepositoryModel] | None
+    aggregated_size: int
+    aggregated_watchers_count: int
+    aggregated_open_issues_count: int
+    aggregated_stars: int
+    aggregated_forks: int
 
     def updated_model_dump(self) -> str:
         """Dump the CompanyModel instance to a JSON string."""
