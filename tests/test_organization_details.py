@@ -6,9 +6,9 @@ from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 
 from parma_mining.github.api.dependencies.auth import authenticate
-from parma_mining.github.api.dependencies.mock_auth import mock_authenticate
 from parma_mining.github.api.main import app
 from parma_mining.mining_common.const import HTTP_200, HTTP_404
+from tests.dependencies.mock_auth import mock_authenticate
 
 
 @pytest.fixture
