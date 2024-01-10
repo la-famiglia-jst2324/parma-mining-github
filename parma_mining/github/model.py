@@ -49,13 +49,6 @@ class OrganizationModel(BaseModel):
         return json.dumps(json_serializable_dict, default=str)
 
 
-class DiscoveryModel(BaseModel):
-    """Discovery model for GitHub data."""
-
-    name: str | None
-    url: str | None
-
-
 class CompaniesRequest(BaseModel):
     """Companies request model for GitHub data."""
 
@@ -68,3 +61,22 @@ class ResponseModel(BaseModel):
     source_name: str
     company_id: str
     raw_data: OrganizationModel
+
+
+class DiscoveryRequest(BaseModel):
+    """Define the input model for the discovery endpoint."""
+
+    companies: dict[str, str]
+
+
+class DiscoveryResponse(BaseModel):
+    """Define the output model for the discovery endpoint."""
+
+    handles: list[str] = []
+
+
+class FinalDiscoveryResponse(BaseModel):
+    """Define the final discovery response model."""
+
+    data: dict[str, DiscoveryResponse]
+    validity: datetime

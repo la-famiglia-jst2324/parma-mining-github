@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, status
@@ -10,7 +11,8 @@ from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
     CompaniesRequest,
-    DiscoveryModel,
+    DiscoveryRequest,
+    FinalDiscoveryResponse,
     ResponseModel,
 )
 from parma_mining.github.normalization_map import GithubNormalizationMap
@@ -91,11 +93,19 @@ def get_organization_details(companies: CompaniesRequest):
     return "done"
 
 
-@app.get(
-    "/search/companies",
-    response_model=list[DiscoveryModel],
+@app.post(
+    "/discover",
+    response_model=FinalDiscoveryResponse,
     status_code=status.HTTP_200_OK,
 )
-def search_organizations(query: str):
-    """Endpoint to search GitHub organizations based on a query."""
-    return github_client.search_organizations(query)
+def discover_companies(request: DiscoveryRequest):
+    """Endpoint to discover organizations based on provided names."""
+    response_data = {}
+    for company_id, name in request.companies.items():
+        response = github_client.search_organizations(name)
+        response_data[company_id] = response
+
+    current_date = datetime.now()
+    valid_until = current_date + timedelta(days=180)
+
+    return FinalDiscoveryResponse(data=response_data, validity=valid_until)
