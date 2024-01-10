@@ -6,6 +6,7 @@ from github import GithubException
 
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import DiscoveryModel, OrganizationModel
+from parma_mining.mining_common.const import HTTP_404
 
 
 @pytest.fixture
@@ -32,7 +33,7 @@ def test_get_organization_details_success(mock_get_org, github_client):
 @patch("github.Github.get_organization")
 def test_get_organization_details_exception(mock_get_org, github_client):
     exception_instance = GithubException(
-        status=404, data={"message": "Not Found"}, headers={}
+        status=HTTP_404, data={"message": "Not Found"}, headers={}
     )
     mock_get_org.side_effect = exception_instance
     with pytest.raises(GithubException):
@@ -55,6 +56,6 @@ def test_search_organizations_success(mock_search_users, github_client):
 
 @patch("github.Github.search_users")
 def test_search_organizations_exception(mock_search_users, github_client):
-    mock_search_users.side_effect = GithubException(status=404)
+    mock_search_users.side_effect = GithubException(status=HTTP_404)
     with pytest.raises(HTTPException):
         github_client.search_organizations("Test")
