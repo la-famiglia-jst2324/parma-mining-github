@@ -1,5 +1,6 @@
 """Main entrypoint for the API routes in of parma-analytics."""
 import json
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -13,6 +14,18 @@ from parma_mining.github.model import (
     ResponseModel,
 )
 from parma_mining.github.normalization_map import GithubNormalizationMap
+
+env = os.getenv("env", "local")
+
+if env == "prod":
+    logging.basicConfig(level=logging.INFO)
+elif env in ["staging", "local"]:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.warning(f"Unknown environment '{env}'. Defaulting to INFO level.")
+    logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -28,6 +41,7 @@ normalization = GithubNormalizationMap()
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
     """Root endpoint for the API."""
+    logger.debug("Root endpoint called")
     return {"welcome": "at parma-mining-github"}
 
 
@@ -68,11 +82,12 @@ def get_organization_details(companies: CompaniesRequest):
                     # Write data to db via endpoint in analytics backend
                     try:
                         analytics_client.feed_raw_data(data)
-                    except Exception:
-                        print("Error writing to db")
+                    except Exception as e:
+                        logger.error(
+                            f"Can't send crawling data to the Analytics. Error: {e}"
+                        )
                 else:
-                    # To be included in logging
-                    print("Unsupported type error")
+                    logger.error(f"Unsupported type error for {data_type} in {handle}")
     return "done"
 
 
