@@ -53,6 +53,9 @@ def mock_github_client(mocker) -> MagicMock:
 def mock_analytics_client(mocker) -> MagicMock:
     """Mocking the AnalyticClient's method to avoid actual API calls during testing."""
     mock = mocker.patch("parma_mining.github.api.main.AnalyticsClient.feed_raw_data")
+    mock = mocker.patch(
+        "parma_mining.github.api.main.AnalyticsClient.crawling_finished"
+    )
     # No return value needed, but you can add side effects or exceptions if necessary
     return mock
 
@@ -61,10 +64,11 @@ def test_get_organization_details(
     mock_github_client: MagicMock, mock_analytics_client: MagicMock
 ):
     payload = {
+        "task_id": 123,
         "companies": {
             "Example_id1": {"name": ["langfuse"]},
             "Example_id2": {"name": ["personio"]},
-        }
+        },
     }
 
     response = client.post("/companies", json=payload)
@@ -83,10 +87,11 @@ def test_get_organization_details_bad_request(mocker):
     )
 
     payload = {
+        "task_id": 123,
         "companies": {
             "Example_id1": {"name": ["langfuse"]},
             "Example_id2": {"name": ["personio"]},
-        }
+        },
     }
 
     response = client.post("/companies", json=payload)
