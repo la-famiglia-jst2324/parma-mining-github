@@ -63,7 +63,7 @@ class GitHubClient:
             return OrganizationModel.model_validate(org_info)
         except GithubException as e:
             logger.error(f"Error fetching organization details for {org_name}: {e}")
-            raise GithubException
+            raise e
 
     def search_organizations(self, query: str) -> list[DiscoveryModel]:
         """Search organizations on GitHub."""
