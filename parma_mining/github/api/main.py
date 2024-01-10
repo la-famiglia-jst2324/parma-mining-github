@@ -11,7 +11,6 @@ from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
     CompaniesRequest,
-    DiscoveryRequest,
     FinalDiscoveryResponse,
     ResponseModel,
 )
@@ -98,14 +97,16 @@ def get_organization_details(companies: CompaniesRequest):
     response_model=FinalDiscoveryResponse,
     status_code=status.HTTP_200_OK,
 )
-def discover_companies(request: DiscoveryRequest):
+def discover_companies(request: dict[str, str]):
     """Endpoint to discover organizations based on provided names."""
     response_data = {}
-    for company_id, name in request.companies.items():
+    for company_id, name in request.items():
+        print(company_id)
+        print(name)
         response = github_client.search_organizations(name)
         response_data[company_id] = response
 
     current_date = datetime.now()
     valid_until = current_date + timedelta(days=180)
 
-    return FinalDiscoveryResponse(data=response_data, validity=valid_until)
+    return FinalDiscoveryResponse(identifiers=response_data, validity=valid_until)

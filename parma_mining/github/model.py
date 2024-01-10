@@ -63,12 +63,6 @@ class ResponseModel(BaseModel):
     raw_data: OrganizationModel
 
 
-class DiscoveryRequest(BaseModel):
-    """Define the input model for the discovery endpoint."""
-
-    companies: dict[str, str]
-
-
 class DiscoveryResponse(BaseModel):
     """Define the output model for the discovery endpoint."""
 
@@ -78,5 +72,5 @@ class DiscoveryResponse(BaseModel):
 class FinalDiscoveryResponse(BaseModel):
     """Define the final discovery response model."""
 
-    data: dict[str, DiscoveryResponse]
+    identifiers: dict[str, DiscoveryResponse]
     validity: datetime
