@@ -88,7 +88,10 @@ def get_organization_details(companies: CompaniesRequest):
                         )
                 else:
                     logger.error(f"Unsupported type error for {data_type} in {handle}")
-    return "done"
+
+    return analytics_client.crawling_finished(
+        {"task_id": companies.task_id, "errors": None}
+    )
 
 
 @app.get(

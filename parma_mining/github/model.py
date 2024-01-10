@@ -59,6 +59,7 @@ class DiscoveryModel(BaseModel):
 class CompaniesRequest(BaseModel):
     """Companies request model for GitHub data."""
 
+    task_id: int
     companies: dict[str, dict[str, list[str]]]
 
 
