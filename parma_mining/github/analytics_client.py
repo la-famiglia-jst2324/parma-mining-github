@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 from parma_mining.github.model import ResponseModel
 from parma_mining.mining_common.const import HTTP_200, HTTP_201
+from parma_mining.mining_common.exceptions import AnalyticsError
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class AnalyticsClient:
                 f"API request failed with status code {response.status_code},"
                 f"response: {response.text}"
             )
-            raise Exception(
+            raise AnalyticsError(
                 f"API request failed with status code {response.status_code},"
                 f"response: {response.text}"
             )
