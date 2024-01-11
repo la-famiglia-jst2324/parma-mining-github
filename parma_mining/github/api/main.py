@@ -5,12 +5,13 @@ import os
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import (
     CompaniesRequest,
+    DiscoveryRequest,
     FinalDiscoveryResponse,
     ResponseModel,
 )
@@ -97,14 +98,19 @@ def get_organization_details(companies: CompaniesRequest):
     response_model=FinalDiscoveryResponse,
     status_code=status.HTTP_200_OK,
 )
-def discover_companies(request: dict[str, str]):
+def discover_companies(request: list[DiscoveryRequest]):
     """Endpoint to discover organizations based on provided names."""
+    if not request:
+        logger.error("Received empty request for discovery")
+        raise HTTPException(status_code=400, detail="Request cannot be empty")
+
     response_data = {}
-    for company_id, name in request.items():
-        print(company_id)
-        print(name)
-        response = github_client.search_organizations(name)
-        response_data[company_id] = response
+    for company in request:
+        logger.debug(
+            f"Discovering with name: {company.name} for company_id {company.company_id}"
+        )
+        response = github_client.search_organizations(company.name)
+        response_data[company.company_id] = response
 
     current_date = datetime.now()
     valid_until = current_date + timedelta(days=180)

@@ -63,6 +63,13 @@ class ResponseModel(BaseModel):
     raw_data: OrganizationModel
 
 
+class DiscoveryRequest(BaseModel):
+    """Request model for the discovery endpoint."""
+
+    company_id: str
+    name: str
+
+
 class DiscoveryResponse(BaseModel):
     """Define the output model for the discovery endpoint."""
 
