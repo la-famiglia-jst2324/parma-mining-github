@@ -43,11 +43,11 @@ def mock_github_client(mocker) -> MagicMock:
                 "forks": 3,
             }
         ],
-        "aggregated_size": 100,
-        "aggregated_watchers_count": 5,
-        "aggregated_open_issues_count": 2,
-        "aggregated_stars": 10,
-        "aggregated_forks": 3,
+        "aggregated_sum_size": 100,
+        "aggregated_sum_watchers_count": 5,
+        "aggregated_sum_open_issues_count": 2,
+        "aggregated_sum_stars": 10,
+        "aggregated_sum_forks": 3,
     }
     return mock
 

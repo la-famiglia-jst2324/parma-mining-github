@@ -28,19 +28,19 @@ class GitHubClient:
                 "description": organization.description,
                 "url": organization.html_url,
                 "repos": [],
-                "aggregated_size": 0,
-                "aggregated_watchers_count": 0,
-                "aggregated_open_issues_count": 0,
-                "aggregated_stars": 0,
-                "aggregated_forks": 0,
+                "aggregated_sum_size": 0,
+                "aggregated_sum_watchers_count": 0,
+                "aggregated_sum_open_issues_count": 0,
+                "aggregated_sum_stars": 0,
+                "aggregated_sum_forks": 0,
             }
 
             for repo in organization.get_repos():
-                org_info["aggregated_size"] += repo.size
-                org_info["aggregated_stars"] += repo.stargazers_count
-                org_info["aggregated_watchers_count"] += repo.watchers_count
-                org_info["aggregated_open_issues_count"] += repo.open_issues_count
-                org_info["aggregated_forks"] += repo.forks_count
+                org_info["aggregated_sum_size"] += repo.size
+                org_info["aggregated_sum_stars"] += repo.stargazers_count
+                org_info["aggregated_sum_watchers_count"] += repo.watchers_count
+                org_info["aggregated_sum_open_issues_count"] += repo.open_issues_count
+                org_info["aggregated_sum_forks"] += repo.forks_count
 
                 parsed_repo = RepositoryModel.model_validate(
                     {

@@ -32,11 +32,11 @@ class OrganizationModel(BaseModel):
     description: str | None
     url: str
     repos: list[RepositoryModel] | None
-    aggregated_size: int
-    aggregated_watchers_count: int
-    aggregated_open_issues_count: int
-    aggregated_stars: int
-    aggregated_forks: int
+    aggregated_sum_size: int
+    aggregated_sum_watchers_count: int
+    aggregated_sum_open_issues_count: int
+    aggregated_sum_stars: int
+    aggregated_sum_forks: int
 
     def updated_model_dump(self) -> str:
         """Dump the CompanyModel instance to a JSON string."""
