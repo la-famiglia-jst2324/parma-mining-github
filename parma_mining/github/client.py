@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from github import Auth, Github, GithubException
 
 from parma_mining.github.model import DiscoveryModel, OrganizationModel, RepositoryModel
+from parma_mining.mining_common.exceptions import CrawlingError
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +72,9 @@ class GitHubClient:
 
             return OrganizationModel.model_validate(org_info)
         except GithubException as e:
-            logger.error(f"Error fetching organization details for {org_name}: {e}")
-            raise GithubException
+            msg = f"Error fetching organization details for {org_name}: {e}"
+            logger.error(msg)
+            raise CrawlingError(msg)
 
     def search_organizations(self, query: str) -> list[DiscoveryModel]:
         """Search organizations on GitHub."""
