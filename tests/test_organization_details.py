@@ -48,14 +48,17 @@ def mock_github_client(mocker) -> MagicMock:
                 "svn_url": "https://svn.github.com/TestOrg/TestRepo",
                 "homepage": "https://testrepo.com",
                 "size": 100,
-                "stargazers_count": 10,
                 "watchers_count": 5,
-                "forks_count": 3,
                 "open_issues_count": 2,
                 "stars": 10,
                 "forks": 3,
             }
         ],
+        "aggregated_sum_size": 100,
+        "aggregated_sum_watchers_count": 5,
+        "aggregated_sum_open_issues_count": 2,
+        "aggregated_sum_stars": 10,
+        "aggregated_sum_forks": 3,
     }
     return mock
 
@@ -64,6 +67,9 @@ def mock_github_client(mocker) -> MagicMock:
 def mock_analytics_client(mocker) -> MagicMock:
     """Mocking the AnalyticClient's method to avoid actual API calls during testing."""
     mock = mocker.patch("parma_mining.github.api.main.AnalyticsClient.feed_raw_data")
+    mock = mocker.patch(
+        "parma_mining.github.api.main.AnalyticsClient.crawling_finished"
+    )
     # No return value needed, but you can add side effects or exceptions if necessary
     return mock
 
@@ -72,10 +78,11 @@ def test_get_organization_details(
     mock_github_client: MagicMock, mock_analytics_client: MagicMock, client: TestClient
 ):
     payload = {
+        "task_id": 123,
         "companies": {
             "Example_id1": {"name": ["langfuse"]},
             "Example_id2": {"name": ["personio"]},
-        }
+        },
     }
 
     headers = {"Authorization": "Bearer test"}
@@ -95,10 +102,11 @@ def test_get_organization_details_bad_request(mocker, client: TestClient):
     )
 
     payload = {
+        "task_id": 123,
         "companies": {
             "Example_id1": {"name": ["langfuse"]},
             "Example_id2": {"name": ["personio"]},
-        }
+        },
     }
 
     headers = {"Authorization": "Bearer test"}
