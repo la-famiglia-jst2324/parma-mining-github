@@ -8,12 +8,20 @@ from fastapi import FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
+from parma_mining.github.helper import collect_errors
 from parma_mining.github.model import (
     CompaniesRequest,
+    CrawlingFinishedInputModel,
     DiscoveryModel,
+    ErrorInfoModel,
     ResponseModel,
 )
 from parma_mining.github.normalization_map import GithubNormalizationMap
+from parma_mining.mining_common.exceptions import (
+    AnalyticsError,
+    ClientInvalidBodyError,
+    CrawlingError,
+)
 
 env = os.getenv("env", "local")
 
@@ -67,13 +75,22 @@ def initialize(source_id: int) -> str:
     "/companies",
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(companies: CompaniesRequest):
+def get_organization_details(body: CompaniesRequest):
     """Endpoint to get detailed information about a dict of organizations."""
-    for company_id, company_data in companies.companies.items():
+    errors: dict[str, ErrorInfoModel] = {}
+    for company_id, company_data in body.companies.items():
         for data_type, handles in company_data.items():
             for handle in handles:
                 if data_type == "name":
-                    org_details = github_client.get_organization_details(handle)
+                    try:
+                        org_details = github_client.get_organization_details(handle)
+                    except CrawlingError as e:
+                        logger.error(
+                            f"Can't fetch company details from GitHub. Error: {e}"
+                        )
+                        collect_errors(company_id, errors, e)
+                        continue
+
                     data = ResponseModel(
                         source_name="github",
                         company_id=company_id,
@@ -82,13 +99,24 @@ def get_organization_details(companies: CompaniesRequest):
                     # Write data to db via endpoint in analytics backend
                     try:
                         analytics_client.feed_raw_data(data)
-                    except Exception as e:
+                    except AnalyticsError as e:
                         logger.error(
                             f"Can't send crawling data to the Analytics. Error: {e}"
                         )
+                        collect_errors(company_id, errors, e)
+
                 else:
-                    logger.error(f"Unsupported type error for {data_type} in {handle}")
-    return "done"
+                    msg = f"Unsupported type error for {data_type} in {handle}"
+                    logger.error(msg)
+                    collect_errors(company_id, errors, ClientInvalidBodyError(msg))
+
+    return analytics_client.crawling_finished(
+        json.loads(
+            CrawlingFinishedInputModel(
+                task_id=body.task_id, errors=errors
+            ).model_dump_json()
+        )
+    )
 
 
 @app.get(

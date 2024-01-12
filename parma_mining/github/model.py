@@ -21,9 +21,7 @@ class RepositoryModel(BaseModel):
     svn_url: str | None
     homepage: str | None
     size: int | None
-    stargazers_count: int | None
     watchers_count: int | None
-    forks_count: int | None
     open_issues_count: int | None
 
 
@@ -34,6 +32,11 @@ class OrganizationModel(BaseModel):
     description: str | None
     url: str
     repos: list[RepositoryModel] | None
+    aggregated_sum_size: int
+    aggregated_sum_watchers_count: int
+    aggregated_sum_open_issues_count: int
+    aggregated_sum_stars: int
+    aggregated_sum_forks: int
 
     def updated_model_dump(self) -> str:
         """Dump the CompanyModel instance to a JSON string."""
@@ -59,6 +62,7 @@ class DiscoveryModel(BaseModel):
 class CompaniesRequest(BaseModel):
     """Companies request model for GitHub data."""
 
+    task_id: int
     companies: dict[str, dict[str, list[str]]]
 
 
@@ -68,3 +72,17 @@ class ResponseModel(BaseModel):
     source_name: str
     company_id: str
     raw_data: OrganizationModel
+
+
+class ErrorInfoModel(BaseModel):
+    """Error info for the crawling_finished endpoint."""
+
+    error_type: str
+    error_description: str | None
+
+
+class CrawlingFinishedInputModel(BaseModel):
+    """Internal base model for the crawling_finished endpoints."""
+
+    task_id: int
+    errors: dict[str, ErrorInfoModel] | None = None
