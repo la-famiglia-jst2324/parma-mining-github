@@ -37,14 +37,17 @@ def mock_github_client(mocker) -> MagicMock:
                 "svn_url": "https://svn.github.com/TestOrg/TestRepo",
                 "homepage": "https://testrepo.com",
                 "size": 100,
-                "stargazers_count": 10,
                 "watchers_count": 5,
-                "forks_count": 3,
                 "open_issues_count": 2,
                 "stars": 10,
                 "forks": 3,
             }
         ],
+        "aggregated_sum_size": 100,
+        "aggregated_sum_watchers_count": 5,
+        "aggregated_sum_open_issues_count": 2,
+        "aggregated_sum_stars": 10,
+        "aggregated_sum_forks": 3,
     }
     return mock
 

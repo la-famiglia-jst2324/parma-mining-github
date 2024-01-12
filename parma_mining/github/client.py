@@ -29,9 +29,20 @@ class GitHubClient:
                 "description": organization.description,
                 "url": organization.html_url,
                 "repos": [],
+                "aggregated_sum_size": 0,
+                "aggregated_sum_watchers_count": 0,
+                "aggregated_sum_open_issues_count": 0,
+                "aggregated_sum_stars": 0,
+                "aggregated_sum_forks": 0,
             }
 
             for repo in organization.get_repos():
+                org_info["aggregated_sum_size"] += repo.size
+                org_info["aggregated_sum_stars"] += repo.stargazers_count
+                org_info["aggregated_sum_watchers_count"] += repo.watchers_count
+                org_info["aggregated_sum_open_issues_count"] += repo.open_issues_count
+                org_info["aggregated_sum_forks"] += repo.forks_count
+
                 parsed_repo = RepositoryModel.model_validate(
                     {
                         "name": repo.name,
@@ -53,9 +64,7 @@ class GitHubClient:
                         "svn_url": repo.svn_url,
                         "homepage": repo.homepage or "",
                         "size": repo.size,
-                        "stargazers_count": repo.stargazers_count,
                         "watchers_count": repo.watchers_count,
-                        "forks_count": repo.forks_count,
                         "open_issues_count": repo.open_issues_count,
                     }
                 )
