@@ -8,6 +8,7 @@ from fastapi import FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
+from parma_mining.github.helper import collect_errors
 from parma_mining.github.model import (
     CompaniesRequest,
     CrawlingFinishedInputModel,
@@ -75,7 +76,7 @@ def initialize(source_id: int) -> str:
 )
 def get_organization_details(body: CompaniesRequest):
     """Endpoint to get detailed information about a dict of organizations."""
-    errors = {}
+    errors: dict[str, ErrorInfoModel] = {}
     for company_id, company_data in body.companies.items():
         for data_type, handles in company_data.items():
             for handle in handles:
@@ -86,9 +87,7 @@ def get_organization_details(body: CompaniesRequest):
                         logger.error(
                             f"Can't fetch company details from GitHub. Error: {e}"
                         )
-                        errors[company_id] = ErrorInfoModel(
-                            error_type=e.__class__.__name__, error_description=e.message
-                        )
+                        errors = collect_errors(company_id, errors, e)
                         continue
 
                     data = ResponseModel(
@@ -103,9 +102,8 @@ def get_organization_details(body: CompaniesRequest):
                         logger.error(
                             f"Can't send crawling data to the Analytics. Error: {e}"
                         )
-                        errors[company_id] = ErrorInfoModel(
-                            error_type=e.__class__.__name__, error_description=e.message
-                        )
+                        errors = collect_errors(company_id, errors, e)
+
                 else:
                     logger.error(f"Unsupported type error for {data_type} in {handle}")
 
