@@ -25,6 +25,11 @@ def mock_organization_model(mock_repository_model):
         description="A test organization",
         url="www.testorg.com",
         repos=[mock_repository_model],
+        aggregated_sum_size=100,
+        aggregated_sum_watchers_count=100,
+        aggregated_sum_open_issues_count=100,
+        aggregated_sum_stars=100,
+        aggregated_sum_forks=100,
     )
 
 

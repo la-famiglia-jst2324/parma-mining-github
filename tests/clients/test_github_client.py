@@ -7,6 +7,7 @@ from github import GithubException
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.model import DiscoveryModel, OrganizationModel
 from parma_mining.mining_common.const import HTTP_404
+from parma_mining.mining_common.exceptions import CrawlingError
 
 
 @pytest.fixture
@@ -32,11 +33,9 @@ def test_get_organization_details_success(mock_get_org, github_client):
 
 @patch("github.Github.get_organization")
 def test_get_organization_details_exception(mock_get_org, github_client):
-    exception_instance = GithubException(
-        status=HTTP_404, data={"message": "Not Found"}, headers={}
-    )
+    exception_instance = CrawlingError("Error fetching organization details!")
     mock_get_org.side_effect = exception_instance
-    with pytest.raises(GithubException):
+    with pytest.raises(CrawlingError):
         github_client.get_organization_details("TestOrg")
 
 
