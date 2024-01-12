@@ -78,7 +78,7 @@ class ErrorInfoModel(BaseModel):
     """Error info for the crawling_finished endpoint."""
 
     error_type: str
-    error_description: str
+    error_description: str | None
 
 
 class CrawlingFinishedInputModel(BaseModel):

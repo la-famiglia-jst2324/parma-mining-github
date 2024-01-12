@@ -19,6 +19,7 @@ from parma_mining.github.model import (
 from parma_mining.github.normalization_map import GithubNormalizationMap
 from parma_mining.mining_common.exceptions import (
     AnalyticsError,
+    ClientInvalidBodyError,
     CrawlingError,
 )
 
@@ -87,7 +88,7 @@ def get_organization_details(body: CompaniesRequest):
                         logger.error(
                             f"Can't fetch company details from GitHub. Error: {e}"
                         )
-                        errors = collect_errors(company_id, errors, e)
+                        collect_errors(company_id, errors, e)
                         continue
 
                     data = ResponseModel(
@@ -102,10 +103,12 @@ def get_organization_details(body: CompaniesRequest):
                         logger.error(
                             f"Can't send crawling data to the Analytics. Error: {e}"
                         )
-                        errors = collect_errors(company_id, errors, e)
+                        collect_errors(company_id, errors, e)
 
                 else:
-                    logger.error(f"Unsupported type error for {data_type} in {handle}")
+                    msg = f"Unsupported type error for {data_type} in {handle}"
+                    logger.error(msg)
+                    collect_errors(company_id, errors, ClientInvalidBodyError(msg))
 
     return analytics_client.crawling_finished(
         json.loads(
