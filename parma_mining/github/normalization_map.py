@@ -79,19 +79,9 @@ class GithubNormalizationMap:
                         "MeasurementName": "repository size",
                     },
                     {
-                        "SourceField": "stargazers_count",
-                        "DataType": "int",
-                        "MeasurementName": "repository stargazers count",
-                    },
-                    {
                         "SourceField": "watchers_count",
                         "DataType": "int",
                         "MeasurementName": "repository watchers count",
-                    },
-                    {
-                        "SourceField": "forks_count",
-                        "DataType": "int",
-                        "MeasurementName": "repository forks count",
                     },
                     {
                         "SourceField": "open_issues_count",
@@ -109,6 +99,31 @@ class GithubNormalizationMap:
                         "MeasurementName": "repository forks",
                     },
                 ],
+            },
+            {
+                "SourceField": "aggregated_size",
+                "DataType": "int",
+                "MeasurementName": "total repository size",
+            },
+            {
+                "SourceField": "aggregated_watchers_count",
+                "DataType": "int",
+                "MeasurementName": "total watchers count",
+            },
+            {
+                "SourceField": "aggregated_open_issues_count",
+                "DataType": "int",
+                "MeasurementName": "total open issues count",
+            },
+            {
+                "SourceField": "aggregated_stars",
+                "DataType": "int",
+                "MeasurementName": "total repository stars",
+            },
+            {
+                "SourceField": "aggregated_forks",
+                "DataType": "int",
+                "MeasurementName": "total repository forks",
             },
         ],
     }
