@@ -35,4 +35,6 @@ module "main" {
   region                        = local.region
   GITHUB_TOKEN                  = var.GITHUB_TOKEN
   ANALYTICS_BASE_URL            = var.ANALYTICS_BASE_URL
+
+  PARMA_SHARED_SECRET_KEY = var.PARMA_SHARED_SECRET_KEY
 }
