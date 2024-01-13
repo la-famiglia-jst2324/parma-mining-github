@@ -1,7 +1,6 @@
 """GitHub client module."""
 import logging
 
-from fastapi import HTTPException, status
 from github import Auth, Github, GithubException
 
 from parma_mining.github.model import (
@@ -9,7 +8,7 @@ from parma_mining.github.model import (
     OrganizationModel,
     RepositoryModel,
 )
-from parma_mining.mining_common.exceptions import CrawlingError
+from parma_mining.mining_common.exceptions import ClientError, CrawlingError
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +89,6 @@ class GitHubClient:
             return DiscoveryResponse.model_validate({"handles": handles})
 
         except GithubException as e:
-            logger.error(f"Error searching organizations for {query}: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error searching organizations",
-            )
+            msg = f"Error searching organizations for {query}: {e}"
+            logger.error(msg)
+            raise ClientError()

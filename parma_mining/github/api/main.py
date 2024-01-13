@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
 from parma_mining.github.client import GitHubClient
@@ -129,8 +129,9 @@ def get_organization_details(body: CompaniesRequest):
 def discover_companies(request: list[DiscoveryRequest]):
     """Endpoint to discover organizations based on provided names."""
     if not request:
-        logger.error("Received empty request for discovery")
-        raise HTTPException(status_code=400, detail="Request cannot be empty")
+        msg = "Request body cannot be empty for discovery"
+        logger.error(msg)
+        raise ClientInvalidBodyError(msg)
 
     response_data = {}
     for company in request:
