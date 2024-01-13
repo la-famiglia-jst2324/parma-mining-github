@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, status
@@ -13,8 +14,9 @@ from parma_mining.github.helper import collect_errors
 from parma_mining.github.model import (
     CompaniesRequest,
     CrawlingFinishedInputModel,
-    DiscoveryModel,
+    DiscoveryRequest,
     ErrorInfoModel,
+    FinalDiscoveryResponse,
     ResponseModel,
 )
 from parma_mining.github.normalization_map import GithubNormalizationMap
@@ -123,11 +125,29 @@ def get_organization_details(
     )
 
 
-@app.get(
-    "/search/companies",
-    response_model=list[DiscoveryModel],
+@app.post(
+    "/discover",
+    response_model=FinalDiscoveryResponse,
     status_code=status.HTTP_200_OK,
 )
-def search_organizations(query: str, token: str = Depends(authenticate)):
-    """Endpoint to search GitHub organizations based on a query."""
-    return github_client.search_organizations(query)
+def discover_companies(
+    request: list[DiscoveryRequest], token: str = Depends(authenticate)
+):
+    """Endpoint to discover organizations based on provided names."""
+    if not request:
+        msg = "Request body cannot be empty for discovery"
+        logger.error(msg)
+        raise ClientInvalidBodyError(msg)
+
+    response_data = {}
+    for company in request:
+        logger.debug(
+            f"Discovering with name: {company.name} for company_id {company.company_id}"
+        )
+        response = github_client.search_organizations(company.name)
+        response_data[company.company_id] = response
+
+    current_date = datetime.now()
+    valid_until = current_date + timedelta(days=180)
+
+    return FinalDiscoveryResponse(identifiers=response_data, validity=valid_until)
