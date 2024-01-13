@@ -1,11 +1,14 @@
 """GitHub client module."""
 import logging
 
-from fastapi import HTTPException, status
 from github import Auth, Github, GithubException
 
-from parma_mining.github.model import DiscoveryModel, OrganizationModel, RepositoryModel
-from parma_mining.mining_common.exceptions import CrawlingError
+from parma_mining.github.model import (
+    DiscoveryResponse,
+    OrganizationModel,
+    RepositoryModel,
+)
+from parma_mining.mining_common.exceptions import ClientError, CrawlingError
 
 logger = logging.getLogger(__name__)
 
@@ -76,17 +79,16 @@ class GitHubClient:
             logger.error(msg)
             raise CrawlingError(msg)
 
-    def search_organizations(self, query: str) -> list[DiscoveryModel]:
+    def search_organizations(self, query: str) -> DiscoveryResponse:
         """Search organizations on GitHub."""
         try:
             organizations = self.client.search_users(query + " type:org")
-            return [
-                DiscoveryModel.model_validate({"name": org.login, "url": org.html_url})
-                for org in organizations
-            ]
+            handles = []
+            for org in organizations:
+                handles.append(org.login)
+            return DiscoveryResponse.model_validate({"handles": handles})
+
         except GithubException as e:
-            logger.error(f"Error searching organizations for {query}: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error searching organizations",
-            )
+            msg = f"Error searching organizations for {query}: {e}"
+            logger.error(msg)
+            raise ClientError()
