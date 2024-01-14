@@ -1,13 +1,10 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
-from github import GithubException
 
 from parma_mining.github.client import GitHubClient
-from parma_mining.github.model import DiscoveryModel, OrganizationModel
-from parma_mining.mining_common.const import HTTP_404
-from parma_mining.mining_common.exceptions import CrawlingError
+from parma_mining.github.model import DiscoveryResponse, OrganizationModel
+from parma_mining.mining_common.exceptions import ClientError, CrawlingError
 
 
 @pytest.fixture
@@ -47,14 +44,13 @@ def test_search_organizations_success(mock_search_users, github_client):
     mock_search_users.return_value = [mock_org]
 
     results = github_client.search_organizations("Test")
-    assert len(results) == 1
-    assert results[0].name == "TestOrg"
-    assert results[0].url == "http://testorg.com"
-    assert isinstance(results[0], DiscoveryModel)
+    assert isinstance(results, DiscoveryResponse)
+    assert len(results.handles) == 1
+    assert results.handles[0] == "TestOrg"
 
 
 @patch("github.Github.search_users")
 def test_search_organizations_exception(mock_search_users, github_client):
-    mock_search_users.side_effect = GithubException(status=HTTP_404)
-    with pytest.raises(HTTPException):
+    mock_search_users.side_effect = ClientError()
+    with pytest.raises(ClientError):
         github_client.search_organizations("Test")
