@@ -2,18 +2,21 @@
 import json
 import logging
 import os
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, status
+from fastapi import Depends, FastAPI, status
 
 from parma_mining.github.analytics_client import AnalyticsClient
+from parma_mining.github.api.dependencies.auth import authenticate
 from parma_mining.github.client import GitHubClient
 from parma_mining.github.helper import collect_errors
 from parma_mining.github.model import (
     CompaniesRequest,
     CrawlingFinishedInputModel,
-    DiscoveryModel,
+    DiscoveryRequest,
     ErrorInfoModel,
+    FinalDiscoveryResponse,
     ResponseModel,
 )
 from parma_mining.github.normalization_map import GithubNormalizationMap
@@ -54,14 +57,14 @@ def root():
 
 
 @app.get("/initialize", status_code=status.HTTP_200_OK)
-def initialize(source_id: int) -> str:
+def initialize(source_id: int, token: str = Depends(authenticate)) -> str:
     """Initialization endpoint for the API."""
     # init frequency
     time = "weekly"
     normalization_map = GithubNormalizationMap().get_normalization_map()
     # register the measurements to analytics
     analytics_client.register_measurements(
-        normalization_map, source_module_id=source_id
+        token=token, mapping=normalization_map, source_module_id=source_id
     )
 
     # set and return results
@@ -75,7 +78,9 @@ def initialize(source_id: int) -> str:
     "/companies",
     status_code=status.HTTP_200_OK,
 )
-def get_organization_details(body: CompaniesRequest):
+def get_organization_details(
+    body: CompaniesRequest, token: str = Depends(authenticate)
+):
     """Endpoint to get detailed information about a dict of organizations."""
     errors: dict[str, ErrorInfoModel] = {}
     for company_id, company_data in body.companies.items():
@@ -98,7 +103,7 @@ def get_organization_details(body: CompaniesRequest):
                     )
                     # Write data to db via endpoint in analytics backend
                     try:
-                        analytics_client.feed_raw_data(data)
+                        analytics_client.feed_raw_data(token, data)
                     except AnalyticsError as e:
                         logger.error(
                             f"Can't send crawling data to the Analytics. Error: {e}"
@@ -111,19 +116,38 @@ def get_organization_details(body: CompaniesRequest):
                     collect_errors(company_id, errors, ClientInvalidBodyError(msg))
 
     return analytics_client.crawling_finished(
+        token,
         json.loads(
             CrawlingFinishedInputModel(
                 task_id=body.task_id, errors=errors
             ).model_dump_json()
-        )
+        ),
     )
 
 
-@app.get(
-    "/search/companies",
-    response_model=list[DiscoveryModel],
+@app.post(
+    "/discover",
+    response_model=FinalDiscoveryResponse,
     status_code=status.HTTP_200_OK,
 )
-def search_organizations(query: str):
-    """Endpoint to search GitHub organizations based on a query."""
-    return github_client.search_organizations(query)
+def discover_companies(
+    request: list[DiscoveryRequest], token: str = Depends(authenticate)
+):
+    """Endpoint to discover organizations based on provided names."""
+    if not request:
+        msg = "Request body cannot be empty for discovery"
+        logger.error(msg)
+        raise ClientInvalidBodyError(msg)
+
+    response_data = {}
+    for company in request:
+        logger.debug(
+            f"Discovering with name: {company.name} for company_id {company.company_id}"
+        )
+        response = github_client.search_organizations(company.name)
+        response_data[company.company_id] = response
+
+    current_date = datetime.now()
+    valid_until = current_date + timedelta(days=180)
+
+    return FinalDiscoveryResponse(identifiers=response_data, validity=valid_until)

@@ -25,3 +25,4 @@ dependencies:
   - pydantic >=2
   - pyyaml
   - uvicorn >=0.23.2
+  - python-jose >=3.3.0
