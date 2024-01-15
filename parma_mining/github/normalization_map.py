@@ -101,27 +101,27 @@ class GithubNormalizationMap:
                 ],
             },
             {
-                "SourceField": "aggregated_size",
+                "SourceField": "aggregated_sum_size",
                 "DataType": "int",
                 "MeasurementName": "total repository size",
             },
             {
-                "SourceField": "aggregated_watchers_count",
+                "SourceField": "aggregated_sum_watchers_count",
                 "DataType": "int",
                 "MeasurementName": "total watchers count",
             },
             {
-                "SourceField": "aggregated_open_issues_count",
+                "SourceField": "aggregated_sum_open_issues_count",
                 "DataType": "int",
                 "MeasurementName": "total open issues count",
             },
             {
-                "SourceField": "aggregated_stars",
+                "SourceField": "aggregated_sum_stars",
                 "DataType": "int",
                 "MeasurementName": "total repository stars",
             },
             {
-                "SourceField": "aggregated_forks",
+                "SourceField": "aggregated_sum_forks",
                 "DataType": "int",
                 "MeasurementName": "total repository forks",
             },
