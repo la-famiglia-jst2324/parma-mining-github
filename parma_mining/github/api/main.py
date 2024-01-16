@@ -26,7 +26,7 @@ from parma_mining.mining_common.exceptions import (
     CrawlingError,
 )
 
-env = os.getenv("env", "local")
+env = os.getenv("DEPLOYMENT_ENV", "local")
 
 if env == "prod":
     logging.basicConfig(level=logging.INFO)
