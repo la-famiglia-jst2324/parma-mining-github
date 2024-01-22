@@ -86,34 +86,26 @@ def get_organization_details(
     for company_id, company_data in body.companies.items():
         for data_type, handles in company_data.items():
             for handle in handles:
-                if data_type == "name":
-                    try:
-                        org_details = github_client.get_organization_details(handle)
-                    except CrawlingError as e:
-                        logger.error(
-                            f"Can't fetch company details from GitHub. Error: {e}"
-                        )
-                        collect_errors(company_id, errors, e)
-                        continue
+                try:
+                    org_details = github_client.get_organization_details(handle)
+                except CrawlingError as e:
+                    logger.error(f"Can't fetch company details from GitHub. Error: {e}")
+                    collect_errors(company_id, errors, e)
+                    continue
 
-                    data = ResponseModel(
-                        source_name="github",
-                        company_id=company_id,
-                        raw_data=org_details,
+                data = ResponseModel(
+                    source_name="github",
+                    company_id=company_id,
+                    raw_data=org_details,
+                )
+                # Write data to db via endpoint in analytics backend
+                try:
+                    analytics_client.feed_raw_data(token, data)
+                except AnalyticsError as e:
+                    logger.error(
+                        f"Can't send crawling data to the Analytics. Error: {e}"
                     )
-                    # Write data to db via endpoint in analytics backend
-                    try:
-                        analytics_client.feed_raw_data(token, data)
-                    except AnalyticsError as e:
-                        logger.error(
-                            f"Can't send crawling data to the Analytics. Error: {e}"
-                        )
-                        collect_errors(company_id, errors, e)
-
-                else:
-                    msg = f"Unsupported type error for {data_type} in {handle}"
-                    logger.error(msg)
-                    collect_errors(company_id, errors, ClientInvalidBodyError(msg))
+                    collect_errors(company_id, errors, e)
 
     return analytics_client.crawling_finished(
         token,
