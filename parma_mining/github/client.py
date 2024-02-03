@@ -84,7 +84,7 @@ class GitHubClient:
         try:
             organizations = self.client.search_users(query + " type:org")
             handles = []
-            for org in organizations:
+            for org in organizations[:2]:
                 handles.append(org.login)
             return DiscoveryResponse.model_validate({"handles": handles})
 
